@@ -19,6 +19,12 @@ switch(command) {
     case 'inspect-object':
         require('../src/commands/inspect-object')(args[0])
         break;
+    case 'ins-obj':
+        require('../tests/inspect-object')(args[0])
+        break;
+    case 'show-tree':
+        require('../tests/show-tree')(args[0])
+        break;
     default:
         console.log("Unknown Command")
         break;

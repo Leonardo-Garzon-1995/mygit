@@ -41,6 +41,8 @@ function parseTree(content) {
 
 function showTree(hash, indent = '') {
   const { header, content } = readObject(hash);
+
+  console.log(`\n🌳 Tree ${hash}\n`);
   
   if (header.startsWith('blob')) {
     console.log(`${indent}${content.toString().slice(0, 50)}...`);
@@ -59,6 +61,4 @@ function showTree(hash, indent = '') {
   }
 }
 
-const hash = process.argv[2] || require('child_process').execSync('mygit write-tree').toString().trim();
-console.log(`\n🌳 Tree ${hash}\n`);
-showTree(hash);
+module.exports = showTree
