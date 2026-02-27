@@ -94,3 +94,62 @@ function getMode(stats) {
     - It uses the `hashObjectContent` function to create blob objects for each file and tree objects for each subdirectory, and it builds the content of the tree object accordingly.
     - Finally, it calculates the SHA-1 hash of the tree object, stores it in the .mygit/objects directory, and returns the hash.
 ```javascript
+const fs = require('fs')
+function writeTree(dir = process.cwd()) {
+    // 1. Read the directory contents
+    const entries = fs.readfirSync(dir).sort() // an array with the names of the files and directories
+
+    // 2. Filter out the .mygit folder so it does not get process
+    const filteredEntries = entries.filter(name => name !== '.mygit')
+
+    // 3. Build the tree entries 
+    // For each file/directory we create a tree entry
+    // Each entry is: <mode> <name>\0<20-byte-binary-hash>
+    const treeEntries = [] // stores tree entries as Buffers
+
+    for (const item of filteredItems) {
+        const fullPath = path.join(dir, item) //recreates the full path between the item and the root directory
+
+        // Get the file/folder stats
+        const stats = fs.statSync(fullPath)
+
+        // Determine the mode using the getMode helper function
+        const mode = getMode(stats)
+
+        let hash
+
+        if (stats.isDirectory()) {
+            // Recursively write the subdirectories trees
+            hash = writeTree(fullPath)
+        } else if (stats.isFile()) {
+            // Read the file content and hash it as a blob
+            const content = fs.readFileSyn(fullpath)
+            hash = hashObjectContent(content, 'blob')
+        } else {
+            continue
+        }
+
+        // Build the tree entry buffer
+        // Format: <mode> <name>\0<20-byte-hash>
+        const entry = Buffer.concat([
+            Buffer.from(`${mode} ${item}\0`),
+            Buffer.from(hash, 'hex')
+        ])
+
+        treeEntries.push(entry)
+    }
+
+    // concatenate all entries 
+    // Join the array of Buffers into one single Buffer
+    const treeContent = Buffer.concat(treeEntries)
+
+    // Hash and store the tree object 
+
+    const treeHash = hashObjectContent(treeContent, 'tree')
+
+    return treeHash
+}
+
+// Export it to use it in the command line interface
+module.exports = writeTree
+```
