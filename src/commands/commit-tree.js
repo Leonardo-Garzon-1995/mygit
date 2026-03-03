@@ -71,7 +71,7 @@ function commitTree(treeHash, message, parentHash = null) {
     }
 
     commitContent += `author ${authorName} <${authorEmail}> ${timestamp} ${timezone}\n`
-    commitContent += `commiter ${committerName} <${committerEmail}> ${timestamp} ${timezone}\n`
+    commitContent += `committer ${committerName} <${committerEmail}> ${timestamp} ${timezone}\n`
     commitContent += `\n${message}\n`
 
     // 5. Hash and store the commit object

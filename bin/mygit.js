@@ -15,7 +15,6 @@ switch(command) {
         const treeHash =require('../src/commands/write-tree')()
         console.log(treeHash)
         break;
-    // TESTS ------------------------
     case 'inspect-object':
         require('../src/commands/inspect-object')(args[0])
         break;
@@ -39,6 +38,19 @@ switch(command) {
         const parent = parentIndex !== -1 ? args[parentIndex + 1] : null
         const commitHash = require('../src/commands/commit-tree') (tree, message, parent)
         console.log(commitHash);
+        break;
+    case 'commit':
+        // Usage: mygit commit -m "message"
+        const msgIndex = args.indexOf('-m');
+        
+        if (msgIndex === -1) {
+            console.error('Error: -m flag required');
+            console.error('Usage: mygit commit -m "message"');
+            process.exit(1);
+        }
+        
+        const commitMessage = args[msgIndex + 1];
+        require('../src/commands/commit')(commitMessage);
         break;
     default:
         console.log("Unknown Command")

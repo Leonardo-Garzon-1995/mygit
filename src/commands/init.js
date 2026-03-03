@@ -9,7 +9,7 @@ function mygitInit(targetDir=process.cwd()) {
     const headFile = path.join(gitDir, 'HEAD')
 
     if (fs.existsSync(gitDir)) {
-        console.log("A '.mygit' file already exist in this folder")
+        console.log("A '.mygit' directory already exist inside this folder.")
         return
     }
 
