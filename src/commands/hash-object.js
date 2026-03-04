@@ -29,15 +29,13 @@ function hashObject(filePath, write=true) {
 
         // Compress the whole storeBuffer
         const compressed = zlib.deflateSync(storeBuffer)
+        console.log("Debug Compressed", compressed)
 
         // Write the compressed blob object to the file
         if (!fs.existsSync(objPath)) {
             fs.writeFileSync(objPath, compressed)
         }
     }
-
-    console.log(hash)
-
     return hash
 }
 
