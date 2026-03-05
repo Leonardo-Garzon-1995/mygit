@@ -59,6 +59,17 @@ switch(command) {
         };
         require('../src/commands/log')(options);
         break;
+    case 'cat-file':
+        // Usage: mygit cat-file [-t | -s | -p] <hash>
+        if (args.length < 2) {
+            console.error('Usage: mygit cat-file [-t | -s | -p] <object>');
+            process.exit(1);
+        }
+        
+        const mode = args[0];
+        const hash = args[1];
+        require('../src/commands/cat-file')(mode, hash);
+        break;
     default:
         console.log("Unknown Command")
         break;
