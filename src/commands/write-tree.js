@@ -91,10 +91,10 @@ function writeTree(dir=process.cwd()) {
   // for sorting purposes), but alphabetical is close enough for learning.
     const entries = fs.readdirSync(dir).sort()
 
-  // ─── STEP 2: Filter out .git directory ──────────────────────────────────────
+  // ─── STEP 2: Filter out .mygit directory ──────────────────────────────────────
   //
-  // We don't want to include .git itself in the tree — that would be recursive
-  // madness. Real Git also ignores .git.
+  // We don't want to include .mygit itself in the tree — that would be recursive
+  // madness. Real Git also ignores .mygit.
     const filteredEntries = entries.filter(name => name !== '.mygit')
 
     // ─── STEP 3: Build tree entries ─────────────────────────────────────────────

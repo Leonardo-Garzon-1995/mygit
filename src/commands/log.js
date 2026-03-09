@@ -8,7 +8,6 @@
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
-const commit = require('./commit')
 
 function readObject(hash) {
     // 1. Read the object from .mygit/objects
