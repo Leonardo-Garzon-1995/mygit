@@ -41,6 +41,12 @@ function parseObject(buffer) {
     }
 }
 function inspectObject(hash) {
+
+    if (!hash) {
+        console.error('Missing hash')
+        console.error('Usage: mygit inspect-object <hash>')
+        process.exit(1)
+    }
     const dir = hash.slice(0,2)
     const file = hash.slice(2)
 
