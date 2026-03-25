@@ -81,6 +81,9 @@ switch(command) {
     case '-h':
         require('../src/utils/displayHelp')(args[0])
         break;
+    case 'status':
+        require('../src/commands/status')()
+        break;
     default:
         require('../src/utils/displayHelp')()
         break;
