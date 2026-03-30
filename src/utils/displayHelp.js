@@ -15,6 +15,8 @@ function displayHelp(command="") {
     console.log('   branch'.padEnd(16) + 'List branches')
     console.log('   cat-file'.padEnd(16) + 'Show info about a mygit object')
     console.log('   checkout'.padEnd(16) + 'Switch branches')
+    console.log('   status'.padEnd(16) + 'Shows the current status of your files in a specific branch')
+    console.log('   show-tree'.padEnd(16) + 'Show the contents of a tree object')
     console.log(`   inspect-object`.padEnd(18) + 'Show detailed info about a mygit object')
 
     console.log('')
@@ -40,6 +42,9 @@ function getCommandHelp(command) {
         case 'inspect-object':
             inspectObjectHelp()
             break;
+        case 'show-tree':
+            showTreeHelp()
+            break
         default:
             console.log('   Unknown command')
             break
@@ -83,6 +88,13 @@ function inspectObjectHelp() {
     console.log('')
     console.log('   inspect-object'.padEnd(18) + 'Show detailed info about a mygit object\n')
     console.log('   mygit inspect-object <object-hash>')
+    console.log('')
+}
+
+function showTreeHelp() {
+    console.log('')
+    console.log('   show-tree'.padEnd(16) + 'Show the contents of a tree object\n')
+    console.log('   mygit show-tree <tree-hash>')
     console.log('')
 }
 
