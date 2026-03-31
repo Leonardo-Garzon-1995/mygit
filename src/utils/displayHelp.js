@@ -45,6 +45,9 @@ function getCommandHelp(command) {
         case 'show-tree':
             showTreeHelp()
             break
+        case 'branch':
+            branchHelp()
+            break
         default:
             console.log('   Unknown command')
             break
@@ -96,6 +99,16 @@ function showTreeHelp() {
     console.log('   show-tree'.padEnd(16) + 'Show the contents of a tree object\n')
     console.log('   mygit show-tree <tree-hash>')
     console.log('')
+}
+
+function branchHelp() {
+    console.log('')
+    console.log('   branch'.padEnd(19) + 'List, create or delete branches\n')
+    console.log('   mygit branch <options/branch-name>')
+    console.log('   branch'.padEnd(19) + 'List all branches')
+    console.log('   -v, --verbose'. padEnd(19) + 'List branches with commit and message info')
+    console.log('   -d, --delete'.padEnd(19) + 'Delete a branch')
+    console.log('   <name>'.padEnd(19) + "Create a new branch")
 }
 
 module.exports = displayHelp
