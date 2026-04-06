@@ -6,8 +6,8 @@ const path = require('path')
  * @returns {string|null} The name of the current branch, or null if HEAD is not a symbolic reference.
  */
 function getCurrentBranch() {
-    const gitDir = path.join(process.cwd(), '.mygit');
-    const headPath = path.join(gitDir, 'HEAD');
+    const mygitDir = path.join(process.cwd(), '.mygit');
+    const headPath = path.join(mygitDir, 'HEAD');
     
     if (!fs.existsSync(headPath)) {
         return null;

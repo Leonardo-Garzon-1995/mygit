@@ -1,3 +1,10 @@
+
+/**
+ * Parse a tree object into human-readable entries
+ * @param {Buffer} content - The content of the tree object (a Buffer)
+ * @returns {Array<Object>} - An array of objects containing the mode, name, and hash of each entry
+ * @throws {Error} - If the tree content is malformed or incomplete
+ */
 function parseTree(content) {
     if (!content || !Buffer.isBuffer(content)) {
         throw new Error('Tree content must be a Buffer');
@@ -36,8 +43,17 @@ function parseTree(content) {
         
         const hashBytes = content.slice(nullPos + 1, nullPos + 21);
         const hash = hashBytes.toString('hex');
+
+        let type;
+        if (mode === '40000') {
+            type = 'tree';
+        } else if (mode === '160000') {
+            type = 'commit';
+        } else {
+            type = 'blob';
+        }
         
-        entries.push({ mode, name, hash });
+        entries.push({ mode, type, name, hash });
         offset = nullPos + 21;
     }
     
