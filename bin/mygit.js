@@ -7,6 +7,8 @@ switch(command) {
     case 'init':
         require('../src/commands/init')()
         break;
+    case 'add':
+        require('../src/commands/add')(args)
     case 'hash-object':
         const hashObj = require('../src/commands/hash-object')(args[0])
         console.log(hashObj)
@@ -84,6 +86,15 @@ switch(command) {
     case 'status':
         require('../src/commands/status')()
         break;
+    // This section is for testing code
+    case 'test':
+        const data =require('../secondTest') (args[0])
+        console.log(data)
+        break;
+    case 'test2':
+        const info = require("../test")()
+        console.log(info)
+        break
     default:
         require('../src/utils/displayHelp')()
         break;
