@@ -5,6 +5,11 @@ const { execSync } = require('child_process');
 const testDir = path.join(__dirname, 'test-catfile-temp');
 
 function cleanup() {
+
+  try {
+    process.chdir(__dirname);
+  } catch (err) {}
+
   if (fs.existsSync(testDir)) {
     fs.rmSync(testDir, { recursive: true, force: true });
   }
@@ -70,6 +75,7 @@ if (!treeContent.includes('test.txt')) {
 }
 
 // Test 6: Show commit type
+run('mygit add test.txt');
 run('mygit commit -m "Test"');
 const commitHash = fs.readFileSync('.mygit/refs/heads/main', 'utf-8').trim();
 const commitType = run(`mygit cat-file -t ${commitHash}`);
