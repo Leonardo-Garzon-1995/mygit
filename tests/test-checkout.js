@@ -5,6 +5,11 @@ const { execSync } = require('child_process');
 const testDir = path.join(__dirname, 'test-checkout-temp');
 
 function cleanup() {
+
+  try {
+    process.chdir(__dirname);
+  } catch (err) {}
+
   if (fs.existsSync(testDir)) {
     fs.rmSync(testDir, { recursive: true, force: true });
   }
@@ -20,12 +25,13 @@ function run(command) {
   return execSync(command, { encoding: 'utf-8' }).trim();
 }
 
-console.log('🧪 Testing checkout command...\n');
+console.log('\n🧪 Testing checkout command...\n');
 
 // Test 1: Checkout updates HEAD
 setup();
 run('mygit init');
 fs.writeFileSync('test.txt', 'hello');
+run('mygit add test.txt');
 run('mygit commit -m "Initial"');
 run('mygit branch feature');
 run('mygit checkout feature');
@@ -48,6 +54,7 @@ if (!fs.existsSync('.mygit/refs/heads/develop')) {
 // Test 3: Files change when switching branches
 run('mygit checkout feature');
 fs.writeFileSync('feature.txt', 'feature-specific');
+run('mygit add feature.txt');
 run('mygit commit -m "Add feature file"');
 
 run('mygit checkout develop');
@@ -68,6 +75,7 @@ if (!fs.existsSync('feature.txt')) {
 run('mygit checkout develop');
 fs.mkdirSync('src');
 fs.writeFileSync('src/app.js', 'code');
+run('mygit add src/app.js');
 run('mygit commit -m "Add src"');
 
 run('mygit checkout feature');
