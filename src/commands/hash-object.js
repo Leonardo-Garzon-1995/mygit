@@ -8,7 +8,17 @@ Blob object structure
     'blob <size>\0<content>'  -*/ 
 
 function hashObject(filePath, write=true) {
+    if (!filePath) {
+        console.error('Error: No file path provided');
+        console.error(' Usage: mygit hash-object <file-path>');
+        process.exit(1);
+    }
+
     const absolutePath = path.resolve(filePath)
+    if (!fs.existsSync(absolutePath)) {
+        console.error(` Error: File ${filePath} does not exist`)
+        process.exit(1)
+    }
     const content = fs.readFileSync(absolutePath)
 
     const header = `blob ${content.length}\0` 
