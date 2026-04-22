@@ -10,32 +10,7 @@ const path = require('path')
 const zlib = require('zlib')
 
 const colors  = require('../utils/colors')
-
-function readObject(hash) {
-    // 1. Read the object from .mygit/objects
-
-    const dir = hash.slice(0, 2)
-    const file = hash.slice(2)
-
-    const objectPath = path.join(process.cwd(), '.mygit', 'objects', dir, file)
-    if (!fs.existsSync(objectPath)) {
-        throw new Error(`Object ${hash} not found`)
-    }
-
-    const compressed = fs.readFileSync(objectPath) // Still a Buffer
-
-    // 2. Decompress the object
-    const decompressed = zlib.inflateSync(compressed)
-
-    // 3. split at the null byte to separate header from content
-    const nullIndex = decompressed.indexOf(0)
-    const header = decompressed.slice(0, nullIndex)
-    const content = decompressed.slice(nullIndex + 1)
-
-    // 4. return an object with the header and the content as Buffers
-
-    return {header, content}
-}
+const readObject = require('../helpers/readObject')
 
 function parseCommit(content) {
     // 1. Parse the commit's object content into structured data
