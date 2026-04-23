@@ -98,6 +98,10 @@ const commands = {
             require(this.modulePath) (mode, hash)
         } 
     },
+    'ls-files': {
+        modulePath: path.join(__dirname, '..', 'src', 'commands', 'ls-files'),
+        handler: function(args) { require(this.modulePath)() }
+    },
 
     // THIS SECTION IS FOR TESTING PURPUSES ONLY - NON REAL COMMANDS
     'test': {
