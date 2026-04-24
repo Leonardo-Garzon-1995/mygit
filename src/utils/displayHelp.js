@@ -1,4 +1,5 @@
 const colors = require('./colors')
+
 function displayHelp(command="") {
 
     if (command) {
@@ -9,17 +10,18 @@ function displayHelp(command="") {
     console.log(`   ${colors.green}USAGE:${colors.reset}\n`)
     console.log(`   mygit <command> [<options/flags>] [<args>]\n`)
     console.log(`   ${colors.green}COMMANDS:${colors.reset}\n`)
-    console.log('   init'.padEnd(16) + 'Create an empty mygit repo')
-    console.log('   add'.padEnd(16) + 'Add file contents to the staging area')
-    console.log('   commit'.padEnd(16) + 'Record changes to the repo')
-    console.log('   log'.padEnd(16) + 'Show commit logs')
+    console.log('   init'.padEnd(16) + 'Creates an empty mygit repo')
+    console.log('   add'.padEnd(16) + 'Adds file contents to the staging area')
+    console.log('   commit'.padEnd(16) + 'Records any staged changes to the repo')
+    console.log('   log'.padEnd(16) + 'Shows commit logs')
     console.log('   branch'.padEnd(16) + 'List branches')
     console.log('   cat-file'.padEnd(16) + 'Show info about a mygit object')
     console.log('   checkout'.padEnd(16) + 'Switch branches')
     console.log('   status'.padEnd(16) + 'Shows the current status of your files in a specific branch')
     console.log('   show-tree'.padEnd(16) + 'Show the contents of a tree object')
+    console.log('   ls-files'.padEnd(16) + 'List all the files in the staging area')
+    console.log('   tag'.padEnd(16) + 'Manage tags')
     console.log(`   inspect-object`.padEnd(18) + 'Show detailed info about a mygit object')
-
     console.log('')
     console.log('   help, -h'.padEnd(16) + 'Display this help message')
     console.log('   For a more detailed description of each command, run `mygit help <command>`')
@@ -55,6 +57,9 @@ function getCommandHelp(command) {
         case 'branch':
             branchHelp()
             break
+        case 'tag':
+            tagHelp()
+            break;
         default:
             console.log('   Unknown command')
             break
@@ -130,6 +135,14 @@ function addHelp() {
     console.log('')
     console.log('   add'.padEnd(16) + 'Add files to the staging area for committing.\n')
     console.log('   mygit add <file\\s>')
+    console.log('')
+}
+
+function tagHelp() {
+    console.log('')
+    console.log('   tag'.padEnd(16) + 'List existing tags or create tags')
+    console.log('   mygit tag'.padEnd(16) + 'List all tags')
+    console.log('   mygit tag <name>'.padEnd(16) + 'Create a new tag')
     console.log('')
 }
 
