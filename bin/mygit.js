@@ -102,6 +102,10 @@ const commands = {
         modulePath: path.join(__dirname, '..', 'src', 'commands', 'ls-files'),
         handler: function(args) { require(this.modulePath)() }
     },
+    'tag': {
+        modulePath: path.join(__dirname, '..', 'src', 'commands', 'tag'),
+        handler: function(args) {require(this.modulePath)(args)}
+    },
 
     // THIS SECTION IS FOR TESTING PURPUSES ONLY - NON REAL COMMANDS
     'test': {
