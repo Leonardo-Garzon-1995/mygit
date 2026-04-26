@@ -214,6 +214,23 @@ test('tag rejects names with path separators', () => {
     assert.strictEqual(fs.readFileSync(branchPath, 'utf-8'), original)
 })
 
+test('tag <name> with traversal in ref arg is rejected', () => {
+    const head = makeCommit('first')
+    seedHead(head)
+
+    const { output, exitCode } = captureOutput(
+        () => tagCmd(['v1', '../../HEAD']),
+    )
+
+    assert.strictEqual(exitCode, 1)
+    assert.match(output, /not a valid ref/)
+    // Tag must not have been written.
+    assert.strictEqual(
+        fs.existsSync(path.join(baseDir, '.mygit', 'refs', 'tags', 'v1')),
+        false,
+    )
+})
+
 test('tag rejects delete with path separators', () => {
     const { output, exitCode } = captureOutput(
         () => tagCmd(['-d', '../heads/main']),

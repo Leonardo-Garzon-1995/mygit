@@ -45,6 +45,13 @@ function ensureTagNameValid(name) {
     }
 }
 
+// isSimpleRefName allows the same set as a tag name: a single path segment
+// with no separators, no whitespace, no leading '-' / '.'. This prevents
+// '../../HEAD' from being treated as a branch / tag lookup.
+function isSimpleRefName(ref) {
+    return validateTagName(ref) === null
+}
+
 function resolveCommit(ref) {
     if (isFullHash(ref)) {
         let obj
@@ -59,6 +66,10 @@ function resolveCommit(ref) {
             process.exit(1)
         }
         return ref
+    }
+    if (!isSimpleRefName(ref)) {
+        console.error(`fatal: '${ref}' is not a valid ref`)
+        process.exit(1)
     }
     const branchPath = getRefPath('heads', ref)
     if (fs.existsSync(branchPath)) {
