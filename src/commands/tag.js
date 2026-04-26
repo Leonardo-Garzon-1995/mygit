@@ -3,6 +3,7 @@ const path = require('path')
 
 const { ensureRepo } = require('../core/repository')
 const getCurrentCommit = require('../helpers/getCurrentCommit')
+const readObject = require('../helpers/readObject')
 
 function getTagsPath() {
     return path.join(process.cwd(), '.mygit', 'refs', 'tags')
@@ -16,8 +17,47 @@ function isFullHash(s) {
     return typeof s === 'string' && /^[0-9a-f]{40}$/.test(s)
 }
 
+// validateTagName rejects names that would escape refs/tags via path
+// traversal or that don't form a usable single-segment ref. Mirrors a
+// subset of `git check-ref-format`: no embedded slashes, no leading
+// '-' or '.', no whitespace or NUL.
+function validateTagName(name) {
+    if (typeof name !== 'string' || name.length === 0) {
+        return 'tag name must be a non-empty string'
+    }
+    if (name.includes('/') || name.includes('\\')) {
+        return `invalid tag name '${name}': must not contain '/' or '\\'`
+    }
+    if (/[\s\0]/.test(name)) {
+        return `invalid tag name '${name}': must not contain whitespace or NUL`
+    }
+    if (name.startsWith('-') || name.startsWith('.')) {
+        return `invalid tag name '${name}': must not start with '-' or '.'`
+    }
+    return null
+}
+
+function ensureTagNameValid(name) {
+    const err = validateTagName(name)
+    if (err) {
+        console.error(`fatal: ${err}`)
+        process.exit(1)
+    }
+}
+
 function resolveCommit(ref) {
     if (isFullHash(ref)) {
+        let obj
+        try {
+            obj = readObject(ref)
+        } catch (e) {
+            console.error(`fatal: '${ref}' is not a valid ref`)
+            process.exit(1)
+        }
+        if (obj.type !== 'commit') {
+            console.error(`fatal: '${ref}' is a ${obj.type}, not a commit`)
+            process.exit(1)
+        }
         return ref
     }
     const branchPath = getRefPath('heads', ref)
@@ -33,6 +73,8 @@ function resolveCommit(ref) {
 }
 
 function createTag(name, commitHash, force) {
+    ensureTagNameValid(name)
+
     const tagsPath = getTagsPath()
     if (!fs.existsSync(tagsPath)) {
         fs.mkdirSync(tagsPath, { recursive: true })
@@ -48,6 +90,8 @@ function createTag(name, commitHash, force) {
 }
 
 function deleteTag(name) {
+    ensureTagNameValid(name)
+
     const tagPath = path.join(getTagsPath(), name)
     if (!fs.existsSync(tagPath)) {
         console.error(`fatal: tag '${name}' not found`)
