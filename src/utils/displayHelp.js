@@ -140,9 +140,14 @@ function addHelp() {
 
 function tagHelp() {
     console.log('')
-    console.log('   tag'.padEnd(16) + 'List existing tags or create tags')
-    console.log('   mygit tag'.padEnd(16) + 'List all tags')
-    console.log('   mygit tag <name>'.padEnd(16) + 'Create a new tag')
+    console.log('   tag'.padEnd(16) + 'List existing tags, create or delete tags\n')
+    console.log('   mygit tag                       List all tags')
+    console.log('   mygit tag <name>                Create a tag at HEAD')
+    console.log('   mygit tag <name> <commit>       Create a tag at <commit>')
+    console.log('   mygit tag -f <name> [<commit>]  Force-overwrite an existing tag')
+    console.log('   mygit tag -d <name>             Delete a tag')
+    console.log('')
+    console.log('   <commit> may be a 40-character hash, a branch name, or another tag name.')
     console.log('')
 }
 
