@@ -1,6 +1,6 @@
 # Mygit
 
-A simple version control system (git-like) implemented in JavaScript, designed to demonstrate how Git works internally. This project implements core Git functionality including repository initialization, staging, committing, branching, and more.
+A simple version control system (git-like) implemented in JavaScript. This project implements core Git functionality including repository initialization, staging, committing, branching, and more.
 
 ## Features
 
@@ -18,6 +18,8 @@ Mygit supports the following commands:
 - **`write-tree`** - Create a tree object from the current index
 - **`commit-tree`** - Create a commit object from a tree
 - **`inspect-object`** - Show detailed information about any mygit object
+- **`ls-files`** - Show information about files in the index
+- **`tag`** - Create or list tags
 
 ## Installation
 
@@ -60,7 +62,7 @@ This will install mygit globally on your system, allowing you to use it from any
    mygit log --oneline
    ```
 
-### Branching and Merging
+### Branching
 
 ```bash
 # List branches
@@ -98,11 +100,11 @@ mygit inspect-object <object-hash>
 # Hash a file (create blob object)
 mygit hash-object file.txt
 
-# Create tree from index
+# Create tree object
 mygit write-tree
 
 # Create commit from tree
-mygit commit-tree <tree-hash> -m "Commit message" -p <parent-commit>
+mygit commit-tree <tree-hash> -m "Commit message" -p <parent-commit-optional>
 ```
 
 ## Project Structure
@@ -146,7 +148,7 @@ Mygit implements Git's core concepts:
 
 Each command manipulates these core data structures to provide version control functionality. The `z-explanation/` directory contains detailed documentation explaining how each feature works internally.
 
-Mygit is still in development and it is not meant to be use as a production-ready product. 
+Mygit is an experimental project and is still in development and by no means it is meant to be use as a production-ready product. 
 
 ## Contributing
 
