@@ -14,12 +14,13 @@ Mygit supports the following commands:
 - **`checkout`** - Switch branches or create new ones
 - **`status`** - Shows the current status of files
 - **`cat-file`** - Display information about repository objects (-t type, -s size, -p pretty-print)
-- **`hash-object`** - Compute object ID and optionally create a blob from a file
+- **`hash-object`** - Compute object hash and optionally create a blob from a file
 - **`write-tree`** - Create a tree object from the current index
 - **`commit-tree`** - Create a commit object from a tree
 - **`inspect-object`** - Show detailed information about any mygit object
 - **`ls-files`** - Show information about files in the index
 - **`tag`** - Create or list tags
+- **`diff`** - Show changes between commits, commit and working tree, or index and working tree
 
 ## Installation
 
