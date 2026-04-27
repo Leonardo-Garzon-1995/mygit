@@ -106,8 +106,12 @@ const commands = {
         modulePath: path.join(__dirname, '..', 'src', 'commands', 'tag'),
         handler: function(args) {require(this.modulePath)(args)}
     },
+    'diff': {
+        modulePath: path.join(__dirname, '..', 'src', 'commands', 'diff'),
+        handler: function(args) { require(this.modulePath) (args)}
+    },
 
-    // THIS SECTION IS FOR TESTING PURPUSES ONLY - NON REAL COMMANDS
+    // THIS SECTION IS FOR TESTING PURPUSES ONLY - NOT REAL COMMANDS
     'test': {
         module: path.join(__dirname, '..', 'test'),
         handler: function(args) { require(this.module) (args) }
