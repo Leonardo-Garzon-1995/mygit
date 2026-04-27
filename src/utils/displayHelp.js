@@ -21,6 +21,7 @@ function displayHelp(command="") {
     console.log('   show-tree'.padEnd(16) + 'Show the contents of a tree object')
     console.log('   ls-files'.padEnd(16) + 'List all the files in the staging area')
     console.log('   tag'.padEnd(16) + 'Manage tags')
+    console.log('   diff'.padEnd(16) + 'Show changes between commits, the staging area, and the working tree')
     console.log(`   inspect-object`.padEnd(18) + 'Show detailed info about a mygit object')
     console.log('')
     console.log('   help, -h'.padEnd(16) + 'Display this help message')
@@ -59,6 +60,9 @@ function getCommandHelp(command) {
             break
         case 'tag':
             tagHelp()
+            break;
+        case 'diff':
+            diffHelp()
             break;
         default:
             console.log('   Unknown command')
@@ -148,6 +152,15 @@ function tagHelp() {
     console.log('   mygit tag -d <name>             Delete a tag')
     console.log('')
     console.log('   <commit> may be a 40-character hash, a branch name, or another tag name.')
+    console.log('')
+}
+
+function diffHelp() {
+    console.log('')
+    console.log('   diff <options>'.padEnd(18) + 'Show changes between commits, the staging area, and the working tree\n')
+    console.log('   mygit diff'.padEnd(18) + 'Show changes in the working tree not yet staged for commit')
+    console.log('   diff --cached'.padEnd(18) + 'Show changes between the staging area and the latest commit')
+    console.log('   diff <hash1> <hash2>'.padEnd(18) + 'Show changes between two commits')
     console.log('')
 }
 
