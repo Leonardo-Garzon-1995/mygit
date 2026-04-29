@@ -22,6 +22,9 @@ Mygit supports the following commands:
 - **`tag`** - Create or list tags
 - **`diff`** - Show changes between commits, commit and working tree, or index and working tree
 
+Other features include:
+- Support for `.mygitignore` files to exclude files from staging, status and diff operations
+
 ## Installation
 
 ### Prerequisites
