@@ -10,6 +10,7 @@ const myersDiff = require('../core/myersDiff')
 const { tokenize } = require('../helpers/tokenize')
 const formatDiff = require('../helpers/formatDiff')
 
+
 /**
  * Extracts the tree hash from a commit object's raw content.
  * First line is always: "tree <hash>"
@@ -22,8 +23,16 @@ function getTreeHashFromCommit(commitHash) {
 }
 
 /**
- * Diffs two text contents and prints the result.
+ * Diffs two text contents and prints the result to the console.
  * Returns early silently if files are identical.
+ * @param {string} aText - First file content (can be empty string for new files)
+ * @param {string} bText - Second file content (can be empty string for deleted files)
+ * @param {string} filePath - Path of the file being diffed (for display purposes)
+ * @param {string} status - 'new', 'deleted', or 'modified' (for display purposes)
+ * @param {string} mode - File mode (for display purposes)
+ * @param {string|null} aHash - Hash of the first version (for display purposes)
+ * @param {string|null} bHash - Hash of the second version (for display purposes)
+ * @returns {void}
  */
 function diffContents(aText, bText, filePath, status, mode, aHash, bHash) {
     const hunks = myersDiff(

@@ -2,6 +2,7 @@ const path = require('path')
 
 const readObject = require('./readObject')
 const parseTree =  require('./parseTree')
+const { getMygitignorePatterns, isIgnored } = require('../utils/mygitignore')
 
 /**
  * Recursively walks a tree object and returns a flat map of all blob paths.
@@ -14,7 +15,7 @@ const parseTree =  require('./parseTree')
  * @param {string} prefix   - accumulated path prefix (used in recursion)
  * @returns {Map<string, string>} - Map<filepath, blobHash>
  */
-function getTreeFiles(treeHash, prefix='') {
+function getTreeFiles(treeHash, prefix='', mygitignorePatterns=null) {
     const { content, type } = readObject(treeHash)
 
     if(type !== 'tree') {
@@ -27,11 +28,16 @@ function getTreeFiles(treeHash, prefix='') {
     for (const entry of entries) {
         const fullPath = prefix ? path.join(prefix, entry.name) : entry.name
 
+        // Skip ignored files
+        if (mygitignorePatterns && isIgnored(fullPath, mygitignorePatterns)) {
+            continue
+        }
+
         if (entry.type === 'blob') {
             files.set(fullPath, {hash: entry.hash, mode: entry.mode})
         } else if (entry.type === 'tree') {
             // Recurse into subdirectory, merge results into files
-            const nested = getTreeFiles(entry.hash, fullPath)
+            const nested = getTreeFiles(entry.hash, fullPath, mygitignorePatterns)
             for (const [path, info] of nested) {
                 files.set(path, info)
             }

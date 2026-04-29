@@ -5,6 +5,7 @@ const path = require('path')
 const getFileMode =  require('../helpers/getFileMode')
 const hashObjectContent = require('../helpers/hashObjectContent')
 const readIndex = require('../helpers/readIndex')
+const { getMygitignorePatterns, isIgnored } = require('../utils/mygitignore')
 
 function getIndexPath() {
     return path.join(process.cwd(), '.mygit', 'index')
@@ -101,6 +102,8 @@ function addDirectory(dirPath) {
 
     const addedFiles = []
 
+    const mygitignorePatterns = getMygitignorePatterns()
+
     function traverse(currentDir) {
         const entries = fs.readdirSync(currentDir)
 
@@ -109,6 +112,11 @@ function addDirectory(dirPath) {
 
             const fullPath = path.join(currentDir, entry)
             const stats = fs.statSync(fullPath)
+
+            // Skip ignored files
+            if (isIgnored(fullPath, mygitignorePatterns)) {
+                continue
+            }
 
             if (stats.isDirectory()) {
                 traverse(fullPath)

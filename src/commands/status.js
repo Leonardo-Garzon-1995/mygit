@@ -8,6 +8,7 @@ const parseTree = require('../helpers/parseTree')
 const getCurrentBranch = require('../helpers/getCurrentBranch')
 const getCurrentCommit = require('../helpers/getCurrentCommit')
 const readIndex = require('../helpers/readIndex')
+const { getMygitignorePatterns, isIgnored} = require('../utils/mygitignore')
 
 function readTree(treeHash, prefix='') {
     // Recursively read a tree and return all the files
@@ -32,10 +33,13 @@ function readTree(treeHash, prefix='') {
     return files
 }
 
-function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.cwd()) {
+function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.cwd(), mygitignorePatterns = null) {
     // ─── Get all files in working directory with their hashes ───────────────
     // Returns: { 'path/to/file.txt': 'computed-hash', ... }
 
+    if (mygitignorePatterns === null) {
+        mygitignorePatterns = getMygitignorePatterns()
+    }
     const files = {}
 
     if (!fs.existsSync(currentDir)) {
@@ -51,9 +55,14 @@ function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.
         const stats = fs.statSync(fullPath)
         const relativePath = path.relative(baseDir, fullPath).split(path.sep).join('/');
 
+        if (isIgnored(relativePath, mygitignorePatterns)) {
+            continue
+        }
+
+
         if (stats.isDirectory()) {
             // Recurse into sub directoru
-            const subfiles = getWorkingDirectoryFiles(baseDir, relativePath)
+            const subfiles = getWorkingDirectoryFiles(baseDir, fullPath, mygitignorePatterns)
             Object.assign(files, subfiles)
         } else if (stats.isFile()) {
             // Hash the file to compare with commited version

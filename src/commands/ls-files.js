@@ -4,8 +4,6 @@ const path = require('path')
 const readIndex = require('../helpers/readIndex')
 const { ensureRepo } = require('../core/repository')
 
-
-
 function lsFiles() {
     ensureRepo()
 
