@@ -21,6 +21,7 @@ Mygit supports the following commands:
 - **`ls-files`** - Show information about files in the index
 - **`tag`** - Create or list tags
 - **`diff`** - Show changes between commits, commit and working tree, or index and working tree
+- **`stash`** - Stash changes in a dirty working directory away
 
 Other features include:
 - Support for `.mygitignore` files to exclude files from staging, status and diff operations
@@ -123,8 +124,8 @@ mygit/
 │   │   ├── add.js
 │   │   ├── commit.js
 │   │   └── ...
-│   ├── core/
-│   ├── helpers/      # Git functionality helpers
+│   ├── core/             # Core data structures and logic
+│   ├── helpers/          # Git functionality helpers
 │   └── utils/            # Utility functions
 ├── tests/                # Test files
 ├── z-explanation/        # Educational documentation
@@ -146,7 +147,7 @@ Tests are written using Node.js built-in test runner and cover all major functio
 Mygit implements Git's core concepts:
 
 - **Objects**: Blobs (files), Trees (directories), and Commits
-- **References**: Branches and HEAD pointing to commits
+- **References**: Branches and HEAD pointing to commits, stashes for temporary storage.
 - **Index/Staging Area**: Tracks files ready for commit
 - **Repository Structure**: `.mygit` directory containing all metadata
 

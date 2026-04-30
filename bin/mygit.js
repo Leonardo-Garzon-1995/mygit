@@ -110,6 +110,10 @@ const commands = {
         modulePath: path.join(__dirname, '..', 'src', 'commands', 'diff'),
         handler: function(args) { require(this.modulePath) (args)}
     },
+    'stash': {
+        modulePath: path.join(__dirname, '..', 'src', 'commands', 'stash'),
+        handler: function(args) { require(this.modulePath)(args)}
+    },
 
     // THIS SECTION IS FOR TESTING PURPUSES ONLY - NOT REAL COMMANDS
     'test': {
