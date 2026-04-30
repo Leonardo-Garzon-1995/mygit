@@ -67,8 +67,14 @@ function commitTree(treeHash, message, parentHash = null) {
 
     // add parent if this isn't the first commit
     if (parentHash) {
+    if (Array.isArray(parentHash)) {
+        for (const parent of parentHash) {
+            commitContent += `parent ${parent}\n`
+        }
+    } else {
         commitContent += `parent ${parentHash}\n`
     }
+}
 
     commitContent += `author ${authorName} <${authorEmail}> ${timestamp} ${timezone}\n`
     commitContent += `committer ${committerName} <${committerEmail}> ${timestamp} ${timezone}\n`
