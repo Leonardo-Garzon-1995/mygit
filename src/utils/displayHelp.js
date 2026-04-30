@@ -22,6 +22,7 @@ function displayHelp(command="") {
     console.log('   ls-files'.padEnd(16) + 'List all the files in the staging area')
     console.log('   tag'.padEnd(16) + 'Manage tags')
     console.log('   diff'.padEnd(16) + 'Show changes between commits, the staging area, and the working tree')
+    console.log('   stash'.padEnd(16) + 'Stash changes in a dirty working directory away')
     console.log(`   inspect-object`.padEnd(18) + 'Show detailed info about a mygit object')
     console.log('')
     console.log('   help, -h'.padEnd(16) + 'Display this help message')
@@ -63,6 +64,9 @@ function getCommandHelp(command) {
             break;
         case 'diff':
             diffHelp()
+            break;
+        case 'stash':
+            stashHelp()
             break;
         default:
             console.log('   Unknown command')
@@ -161,6 +165,18 @@ function diffHelp() {
     console.log('   mygit diff'.padEnd(18) + 'Show changes in the working tree not yet staged for commit')
     console.log('   diff --cached'.padEnd(18) + 'Show changes between the staging area and the latest commit')
     console.log('   diff <hash1> <hash2>'.padEnd(18) + 'Show changes between two commits')
+    console.log('')
+}
+
+function stashHelp() {
+    console.log('')
+    console.log('   stash <options>'.padEnd(18) + 'Stash changes in a dirty working directory away\n')
+    console.log('   mygit stash'.padEnd(18) + 'Stash changes in the working directory')
+    console.log('   stash list'.padEnd(18) + 'List all stashed changes')
+    console.log('   stash show'.padEnd(18) + 'Show the most recent stashed changes')
+    console.log('   stash pop'.padEnd(18) + 'Apply the most recent stashed changes and remove them from the stash')
+    console.log('   stash drop'.padEnd(18) + 'Remove the most recent stashed changes')
+    console.log('   stash apply'.padEnd(18) + 'Apply stashed changes without removing them from the stash')
     console.log('')
 }
 
