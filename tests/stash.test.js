@@ -8,6 +8,7 @@ const crypto = require('crypto')
 const { setupRepo, cleanupRepo, baseDir } = require('./helpers/setup')
 const captureOutput = require('./helpers/captureOutput')
 const stash = require('../src/commands/stash')
+const readObject = require('../src/helpers/readObject')
 
 test.beforeEach(() => {
     setupRepo()
@@ -124,6 +125,10 @@ test('stash (default) saves working directory changes', () => {
     assert.strictEqual(stashData.stashes[0].id, 'stash@{0}')
     assert.strictEqual(stashData.stashes[0].message, 'WIP: stash')
     assert.match(output, /Saved working directory to stash@{0}/)
+    assert.strictEqual(
+        fs.readFileSync(path.join(baseDir, 'file.txt'), 'utf-8'),
+        'initial content'
+    )
 })
 
 test('stash save <message> saves with custom message', () => {
@@ -136,6 +141,10 @@ test('stash save <message> saves with custom message', () => {
     assert.strictEqual(stashData.stashes.length, 1)
     assert.strictEqual(stashData.stashes[0].message, 'my custom message')
     assert.match(output, /Saved working directory to stash@{0}/)
+    assert.strictEqual(
+        fs.readFileSync(path.join(baseDir, 'file.txt'), 'utf-8'),
+        'initial content'
+    )
 })
 
 test('stash creates multiple stashes with proper indexing', () => {
@@ -220,9 +229,11 @@ test('stash apply restores stashed changes', () => {
     captureOutput(() => stash(['save', 'Test stash']))
 
     const { output } = captureOutput(() => stash(['apply', 'stash@{0}']))
+    const filePath = path.join(baseDir, 'file.txt')
 
     assert.match(output, /Applied stash@{0}/)
-    assert.ok(fs.existsSync(path.join(baseDir, 'file.txt')))
+    assert.ok(fs.existsSync(filePath))
+    assert.strictEqual(fs.readFileSync(filePath, 'utf8'), 'modified content')
 })
 
 test('stash apply does not remove stash from list', () => {
@@ -247,7 +258,10 @@ test('stash apply with invalid reference shows error', () => {
 test('stash apply with malformed reference shows error', () => {
     createInitialCommit()
 
-    assert.throws(() => captureOutput(() => stash(['apply', 'invalid'])), /Invalid stash reference/)
+    assert.throws(
+        () => captureOutput(() => stash(['apply', 'invalid'])),
+        /Invalid stash reference/
+    )
 })
 
 // Test stashPop
@@ -257,10 +271,17 @@ test('stash pop restores stashed changes', () => {
     createFileWithContent('file.txt', 'modified')
     captureOutput(() => stash(['save', 'Test stash']))
 
+    // Ensure pop must actively restore stashed content.
+    fs.writeFileSync(path.join(baseDir, 'file.txt'), 'post-stash content')
+
     const { output } = captureOutput(() => stash(['pop']))
 
     assert.match(output, /Popped stash@{0}/)
     assert.ok(fs.existsSync(path.join(baseDir, 'file.txt')))
+    assert.strictEqual(
+        fs.readFileSync(path.join(baseDir, 'file.txt'), 'utf-8'),
+        'modified'
+    )
 })
 
 test('stash pop removes stash from list', () => {
@@ -316,6 +337,7 @@ test('stash drop removes a stash by reference', () => {
     assert.match(output, /Dropped stash@{1}/)
     const stashData = readStashFile()
     assert.strictEqual(stashData.stashes.length, 1)
+    assert.strictEqual(stashData.stashes[0].message, 'Second')
 })
 
 test('stash drop reindexes remaining stashes', () => {
@@ -331,6 +353,7 @@ test('stash drop reindexes remaining stashes', () => {
 
     const stashData = readStashFile()
     assert.strictEqual(stashData.stashes[0].id, 'stash@{0}')
+    assert.strictEqual(stashData.stashes[0].message, 'Second')
 })
 
 test('stash drop with invalid reference shows error', () => {
@@ -344,7 +367,10 @@ test('stash drop with invalid reference shows error', () => {
 test('stash drop with malformed reference shows error', () => {
     createInitialCommit()
 
-    assert.throws(() => captureOutput(() => stash(['drop', 'invalid'])), /Invalid stash reference/)
+    assert.throws(
+        () => captureOutput(() => stash(['drop', 'invalid'])),
+        /Invalid stash reference/
+    )
 })
 
 // Test stashClear
@@ -383,9 +409,14 @@ test('stash show displays stash content', () => {
     createFileWithContent('file.txt', 'stashed content')
     captureOutput(() => stash(['save', 'Test stash']))
 
+    const stashData = readStashFile()
+    const stashedCommit = stashData.stashes[0].commit
+    const expectedPayload = readObject(stashedCommit).content.toString()
+
     const { output } = captureOutput(() => stash(['show', 'stash@{0}']))
 
     assert.ok(output.includes('--- stash@{0} ---'))
+    assert.ok(output.includes(expectedPayload))
 })
 
 test('stash show with invalid reference shows error', () => {
@@ -399,7 +430,10 @@ test('stash show with invalid reference shows error', () => {
 test('stash show with malformed reference shows error', () => {
     createInitialCommit()
 
-    assert.throws(() => captureOutput(() => stash(['show', 'invalid'])), /Invalid stash reference/)
+    assert.throws(
+        () => captureOutput(() => stash(['show', 'invalid'])),
+        /Invalid stash reference/
+    )
 })
 
 // Test unknown command
