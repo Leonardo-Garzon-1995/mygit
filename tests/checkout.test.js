@@ -5,7 +5,8 @@ const assert = require('node:assert')
 const zlib = require('zlib')
 const crypto = require('crypto')
 
-const { setupRepo, cleanupRepo, baseDir } = require('./helpers/setup')
+const { setupRepo, cleanupRepo, baseDir, } = require('./helpers/setup')
+const captureOutput = require('./helpers/captureOutput')
 const checkout = require('../src/commands/checkout')
 
 test.beforeEach(() => {
@@ -112,38 +113,7 @@ function createBranch(branchName, commitHash) {
     fs.writeFileSync(branchPath, commitHash + '\n')
 }
 
-function captureOutput(fn) {
-    const originalLog = console.log
-    const originalError = console.error
-    const originalExit = process.exit
-    let output = []
-    let exitCode = null
-    
-    console.log = (...args) => {
-        output.push(args.join(' '))
-    }
-    console.error = (...args) => {
-        output.push(args.join(' '))
-    }
-    process.exit = (code) => {
-        exitCode = code
-        throw new Error(`EXIT ${code}`)
-    }
-    
-    try {
-        fn()
-    } catch (err) {
-        if (!err.message || !err.message.includes('EXIT')) {
-            throw err
-        }
-    } finally {
-        console.log = originalLog
-        console.error = originalError
-        process.exit = originalExit
-    }
-    
-    return { output: output.join('\n'), exitCode }
-}
+
 
 function getCurrentBranch() {
     const headPath = path.join(baseDir, '.mygit', 'HEAD')

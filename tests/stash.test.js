@@ -6,6 +6,7 @@ const zlib = require('zlib')
 const crypto = require('crypto')
 
 const { setupRepo, cleanupRepo, baseDir } = require('./helpers/setup')
+const { readStash } = require('../src/core/stash')
 const captureOutput = require('./helpers/captureOutput')
 const stash = require('../src/commands/stash')
 const readObject = require('../src/helpers/readObject')
@@ -89,13 +90,6 @@ function seedHead(commitHash) {
     )
 }
 
-function readStashFile() {
-    const stashPath = path.join(baseDir, '.mygit', 'refs', 'stash.json')
-    if (!fs.existsSync(stashPath)) {
-        return { stashes: [] }
-    }
-    return JSON.parse(fs.readFileSync(stashPath, 'utf-8'))
-}
 
 function createFileWithContent(filename, content) {
     fs.writeFileSync(filename, content)
@@ -120,7 +114,7 @@ test('stash (default) saves working directory changes', () => {
 
     const { output } = captureOutput(() => stash([]))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 1)
     assert.strictEqual(stashData.stashes[0].id, 'stash@{0}')
     assert.strictEqual(stashData.stashes[0].message, 'WIP: stash')
@@ -137,7 +131,7 @@ test('stash save <message> saves with custom message', () => {
 
     const { output } = captureOutput(() => stash(['save', 'my', 'custom', 'message']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 1)
     assert.strictEqual(stashData.stashes[0].message, 'my custom message')
     assert.match(output, /Saved working directory to stash@{0}/)
@@ -156,7 +150,7 @@ test('stash creates multiple stashes with proper indexing', () => {
     createFileWithContent('file.txt', 'second stash')
     captureOutput(() => stash(['save', 'Second stash']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 2)
     assert.strictEqual(stashData.stashes[0].id, 'stash@{0}')
     assert.strictEqual(stashData.stashes[0].message, 'Second stash')
@@ -170,7 +164,7 @@ test('stash stores timestamp with each entry', () => {
 
     captureOutput(() => stash(['save', 'Test stash']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.ok(typeof stashData.stashes[0].timestamp === 'number')
     assert.ok(stashData.stashes[0].timestamp > 0)
 })
@@ -181,7 +175,7 @@ test('stash stores commit hash with each entry', () => {
 
     captureOutput(() => stash(['save', 'Test stash']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.ok(stashData.stashes[0].commit)
     assert.match(stashData.stashes[0].commit, /^[0-9a-f]{40}$/)
 })
@@ -243,7 +237,7 @@ test('stash apply does not remove stash from list', () => {
 
     captureOutput(() => stash(['apply', 'stash@{0}']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 1)
 })
 
@@ -289,11 +283,11 @@ test('stash pop removes stash from list', () => {
     createFileWithContent('file.txt', 'modified')
     captureOutput(() => stash(['save', 'Test stash']))
 
-    assert.strictEqual(readStashFile().stashes.length, 1)
+    assert.strictEqual(readStash().stashes.length, 1)
 
     captureOutput(() => stash(['pop']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 0)
 })
 
@@ -308,7 +302,7 @@ test('stash pop reindexes remaining stashes', () => {
 
     captureOutput(() => stash(['pop']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes[0].id, 'stash@{0}')
     assert.strictEqual(stashData.stashes[0].message, 'First')
 })
@@ -335,7 +329,7 @@ test('stash drop removes a stash by reference', () => {
     const { output } = captureOutput(() => stash(['drop', 'stash@{1}']))
 
     assert.match(output, /Dropped stash@{1}/)
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 1)
     assert.strictEqual(stashData.stashes[0].message, 'Second')
 })
@@ -351,7 +345,7 @@ test('stash drop reindexes remaining stashes', () => {
 
     captureOutput(() => stash(['drop', 'stash@{1}']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes[0].id, 'stash@{0}')
     assert.strictEqual(stashData.stashes[0].message, 'Second')
 })
@@ -387,7 +381,7 @@ test('stash clear removes all stashes', () => {
     const { output } = captureOutput(() => stash(['clear']))
 
     assert.match(output, /Cleared all stashes/)
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.strictEqual(stashData.stashes.length, 0)
 })
 
@@ -398,7 +392,7 @@ test('stash clear creates empty stash file', () => {
 
     captureOutput(() => stash(['clear']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     assert.deepStrictEqual(stashData, { stashes: [] })
 })
 
@@ -409,7 +403,7 @@ test('stash show displays stash content', () => {
     createFileWithContent('file.txt', 'stashed content')
     captureOutput(() => stash(['save', 'Test stash']))
 
-    const stashData = readStashFile()
+    const stashData = readStash()
     const stashedCommit = stashData.stashes[0].commit
     const expectedPayload = readObject(stashedCommit).content.toString()
 
@@ -453,6 +447,6 @@ test('stash save outside a mygit repository fails cleanly', () => {
 
     const { output } = captureOutput(() => stash(['save', 'Test stash']))
 
-    assert.match(output, /(not a mygit repository|outside a mygit repository)/i)
+    assert.match(output, /fatal: not a mygit repository/i)
     assert.strictEqual(fs.existsSync(mygitDir), false)
 })

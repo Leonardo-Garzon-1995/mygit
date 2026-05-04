@@ -7,24 +7,13 @@ const zlib = require('zlib')
 const commitTree = require('../src/commands/commit-tree')
 const writeTree = require('../src/commands/write-tree')
 const { setupRepo, cleanupRepo, baseDir } = require('./helpers/setup')
+const captureOutput = require('./helpers/captureOutput')
+const readObject = require('../src/helpers/readObject')
 
 test.beforeEach(setupRepo)
 test.afterEach(cleanupRepo)
 
 // HELPERS
-function readObject(hash) {
-    const objPath = path.join(baseDir, '.mygit', 'objects', hash.slice(0, 2), hash.slice(2))
-
-    const compressed = fs.readFileSync(objPath)
-    const decompressed = zlib.inflateSync(compressed)
-
-    const nullIndex = decompressed.indexOf(0)
-
-    return {
-        header: decompressed.slice(0, nullIndex).toString(),
-        content: decompressed.slice(nullIndex + 1)
-    }
-}
 
 function objectPath(hash) {
     return path.join(baseDir, '.mygit', 'objects', hash.slice(0, 2), hash.slice(2))
@@ -52,38 +41,6 @@ function setAuthorEnv(t, name, email) {
     })
 }
 
-function captureOutput(fn) {
-    const originalLog = console.log
-    const originalError = console.error
-    const originalExit = process.exit
-    let output = []
-    let exitCode = null
-
-    console.log = (...args) => {
-        output.push(args.join(' '))
-    }
-    console.error = (...args) => {
-        output.push(args.join(' '))
-    }
-    process.exit = (code) => {
-        exitCode = code
-        throw new Error(`EXIT ${code}`)
-    }
-
-    try {
-        fn()
-    } catch (err) {
-        if (!err.message || !err.message.includes('EXIT')) {
-            throw err
-        }
-    } finally {
-        console.log = originalLog
-        console.error = originalError
-        process.exit = originalExit
-    }
-
-    return { output: output.join('\n'), exitCode }
-}
 
 // ______TESTS______
 
