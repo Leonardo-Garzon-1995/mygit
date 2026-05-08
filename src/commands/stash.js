@@ -9,6 +9,12 @@ const {
     stashShow
 } = require('../core/stash')
 
+/**
+ * Dispatches stash subcommands for saving, listing, applying, popping, dropping, clearing, or showing stashes.
+ * With no subcommand, saves the current working tree as a default WIP stash.
+ * @param {string[]} args - Stash subcommand arguments, including optional messages or stash references
+ * @throws {Error} If the repository is missing or a stash reference is malformed
+ */
 function stash(args) {
     ensureRepo()
     const cmd = args[0]

@@ -95,6 +95,12 @@ function updateWorkingDirectory(targetFiles) {
     }
 }
 
+/**
+ * Switches HEAD and the working directory to another branch.
+ * With -b, creates the branch at the current commit before checking it out.
+ * @param {string[]} args - Checkout arguments, optionally including -b followed by a branch name
+ * @throws {Error} If the repository, branch name, commit, tree, or working directory update is invalid
+ */
 function checkout(args) {
 
     // --1. Check if you are in a mygit repo

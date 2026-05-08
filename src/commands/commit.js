@@ -96,6 +96,13 @@ function writeTreeFromIndex(entries, prefix='') {
 
 
 
+/**
+ * Creates a commit from the current index and advances the current branch reference.
+ * Uses the existing branch tip as the parent commit when one exists.
+ * @param {string} message - Commit message to include in the new commit
+ * @returns {string} Hash of the created commit object
+ * @throws {Error} If the message, repository, index, HEAD, or parent commit reference is invalid
+ */
 function commit(message) {
     // 1. Validate Messalge
     if(!message) {

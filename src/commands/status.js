@@ -79,6 +79,11 @@ function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.
     return files
 }
 
+/**
+ * Prints the current branch and summarises staged, unstaged, and untracked file changes.
+ * Handles both repositories with no commits yet and repositories with an existing HEAD commit.
+ * @throws {Error} If the repository is missing or the current commit cannot be read
+ */
 function status() {
     // 1. Check if in a mygit repo
 

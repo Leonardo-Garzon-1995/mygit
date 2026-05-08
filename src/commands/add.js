@@ -132,6 +132,12 @@ function addDirectory(dirPath) {
     return addedFiles
 }
 
+/**
+ * Adds files or directories to the index after hashing their current content.
+ * The special "." argument recursively stages files from the current directory, respecting mygitignore rules.
+ * @param {string[]} args - Paths or directory patterns to add to the index
+ * @throws {Error} If the current directory is not a mygit repository
+ */
 function add(args) {
     // 1. Check if in a mygit repositiry 
     ensureRepo()
@@ -170,4 +176,3 @@ function add(args) {
 }
 
 module.exports = add
-

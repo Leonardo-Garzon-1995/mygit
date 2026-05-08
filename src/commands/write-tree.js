@@ -39,20 +39,10 @@ function getMode(filePath, stats) {
 
 
 /**
- * Write a tree object to disk.
- *
- * A tree object is a Git object that stores a hierarchical directory
- * structure. It is used to represent the files and directories in a
- * repository.
- *
- * This function takes a directory path as an argument and recursively
- * traverses the directory, creating tree entries for each file and
- * directory. The tree entries are concatenated into a single byte
- * array, which is then hashed and stored as a tree object in the
- * .mygit/objects directory.
- *
- * @param {string} dir the directory path to write the tree object for
- * @returns {string} the hash of the tree object
+ * Recursively writes the directory contents as tree and blob objects.
+ * Returns the hash of the tree object representing the requested directory.
+ * @param {string} [dir=process.cwd()] - Directory path to convert into a tree object
+ * @returns {string} Hash of the stored tree object
  */
 function writeTree(dir=process.cwd()) {
     // ─── STEP 1: Read directory contents ────────────────────────────────────────

@@ -131,8 +131,10 @@ function diffCommits(hashA, hashB) {
 }
 
 /**
- * CLI entry point.
- * @returns {void}
+ * Prints diffs for working tree changes, staged changes, or two commits.
+ * With --cached it compares the index to HEAD; with two hashes it compares those commits.
+ * @param {string[]} [args=[]] - Diff arguments, either --cached or two commit hashes
+ * @throws {Error} If the repository is missing or a compared object is not a commit
  */
 function diff(args = []) {
     ensureRepo()
@@ -147,4 +149,3 @@ function diff(args = []) {
 }
 
 module.exports = diff 
-

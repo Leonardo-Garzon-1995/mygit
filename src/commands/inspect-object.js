@@ -40,6 +40,12 @@ function parseObject(buffer) {
         console.log(content.toString())
     }
 }
+/**
+ * Decompresses a stored object and prints its type, size, and parsed content.
+ * Tree objects are displayed entry by entry with mode, name, and hash.
+ * @param {string} hash - Full object hash to inspect
+ * @throws {Error} If the hash is missing, the object is not found, or decompression fails
+ */
 function inspectObject(hash) {
 
     if (!hash) {

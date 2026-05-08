@@ -169,6 +169,12 @@ function deleteBranch(branchName, force=false) {
 
 // MAIN FUNCTION TO HANDLE THE BRANCH COMMAND
 
+/**
+ * Lists branches, creates a branch at the current commit, or deletes an existing branch.
+ * Supports verbose listing and delete flags while protecting the checked-out branch from deletion.
+ * @param {string[]} [args=[]] - Branch options, flags, or the branch name to create
+ * @throws {Error} If the repository is missing, an option is invalid, or branch creation/deletion cannot proceed
+ */
 function branch(args=[]) {
     // 1. Check if we're in a mygit repository
     const mygitDir = path.join(process.cwd(), '.mygit')

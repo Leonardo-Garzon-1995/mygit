@@ -7,6 +7,14 @@ const zlib = require('zlib')
 Blob object structure
     'blob <size>\0<content>'  -*/ 
 
+/**
+ * Hashes a file as a blob object using the same header and compression format as mygit objects.
+ * Optionally writes the compressed blob into the object database.
+ * @param {string} filePath - Path of the file to hash
+ * @param {boolean} [write=true] - Whether to write the blob object to .mygit/objects
+ * @returns {string} SHA-1 hash of the blob object
+ * @throws {Error} If the file path is missing or the file does not exist
+ */
 function hashObject(filePath, write=true) {
     if (!filePath) {
         console.error('Error: No file path provided');

@@ -137,6 +137,12 @@ function parseArgs(args) {
     return { opts, positional }
 }
 
+/**
+ * Lists tags, creates a lightweight tag, or deletes an existing tag reference.
+ * Tag targets may be the current commit, a branch or tag name, or a full commit hash.
+ * @param {string[]} args - Tag flags and positional arguments
+ * @throws {Error} If the repository, tag name, target ref, or delete request is invalid
+ */
 function tag(args) {
     ensureRepo()
 

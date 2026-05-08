@@ -4,6 +4,11 @@ const path = require('path')
 const readIndex = require('../helpers/readIndex')
 const { ensureRepo } = require('../core/repository')
 
+/**
+ * Prints the staged file paths recorded in the index, sorted alphabetically.
+ * Returns silently when the index is empty or has no entries.
+ * @throws {Error} If the current directory is not a mygit repository
+ */
 function lsFiles() {
     ensureRepo()
 

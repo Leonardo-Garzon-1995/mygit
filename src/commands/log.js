@@ -100,6 +100,12 @@ function formatCommit(hash, commit, isShort=false) {
     return output
 }
 
+/**
+ * Walks the current branch history from HEAD and prints each reachable commit.
+ * Supports an oneline display mode for compact commit output.
+ * @param {{oneline?: boolean}} [options={}] - Display options for the log output
+ * @throws {Error} If the repository or HEAD reference is invalid
+ */
 function log(options = {}) {
     // 1. Check if we're in a mygit repository
     const gitDir = path.join(process.cwd(), '.mygit')

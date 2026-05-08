@@ -35,6 +35,13 @@ function prettyPrint(type, content) {
     }
 }
 
+/**
+ * Reads an object from the object database and prints its type, size, or pretty content.
+ * Short hash prefixes are resolved before the object is loaded.
+ * @param {string} flags - Display mode: -t for type, -s for size, or -p for pretty content
+ * @param {string} hash - Full object hash or unique hash prefix to inspect
+ * @throws {Error} If arguments are missing, the hash is invalid or ambiguous, or the mode is unknown
+ */
 function catFile(flags, hash) {
     // 1. Validate inputs
 

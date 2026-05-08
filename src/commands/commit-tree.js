@@ -31,6 +31,15 @@ function hashObjectContent(content, type='blob') {
     return hash
 }
 
+/**
+ * Builds and stores a commit object for a tree, including author metadata and optional parent commits.
+ * Returns the SHA-1 hash of the newly stored commit object.
+ * @param {string} treeHash - Hash of the tree object to commit
+ * @param {string} message - Commit message to store in the commit object
+ * @param {string|string[]|null} [parentHash=null] - Parent commit hash or hashes, if any
+ * @returns {string} Hash of the stored commit object
+ * @throws {Error} If the tree hash or commit message is missing
+ */
 function commitTree(treeHash, message, parentHash = null) {
     //  1. Validate inputs
     if (!treeHash) {
