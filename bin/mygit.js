@@ -50,7 +50,17 @@ const commands = {
     'hash-object': {
         modulePath: path.join(__dirname, '..', 'src', 'commands', 'hash-object'),
         handler: function (args) {
-            const hashObj = require(this.modulePath) (args[0])
+            const typeFlag = args.includes("-t")
+            const writeFlag = args.includes("-w")
+
+            if (typeFlag === -1) {
+                console.error('Error: -t flag required to specify the type of object')
+                console.error("Types of objects: 'blob', 'tree' commit")
+                process.exit(1)
+            }
+
+            const type = typeFlag ? args[args.indexOf("-t") + 1] : 'blob'
+            const hashObj = require(this.modulePath) (type, args[0], writeFlag)
             console.log(hashObj)
         }
     },
