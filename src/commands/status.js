@@ -31,7 +31,12 @@ function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.
         if (entry === '.mygit') continue
 
         const fullPath = path.join(currentDir, entry)
-        const stats = fs.statSync(fullPath)
+        let stats;
+        try {
+            stats = fs.lstatSync(fullPath)
+        } catch (e) {
+            continue;
+        }
         const relativePath = path.relative(baseDir, fullPath).split(path.sep).join('/');
 
         if (isIgnored(relativePath, mygitignorePatterns) && !indexEntries[relativePath]) {
@@ -40,12 +45,17 @@ function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.
 
 
         if (stats.isDirectory()) {
-            // Recurse into sub directoru
+            // Recurse into sub directory
             const subfiles = getWorkingDirectoryFiles(baseDir, fullPath, mygitignorePatterns, indexEntries)
             Object.assign(files, subfiles)
-        } else if (stats.isFile()) {
+        } else if (stats.isFile() || stats.isSymbolicLink()) {
             // Hash the file to compare with commited version
-            const content = fs.readFileSync(fullPath)
+            let content;
+            if (stats.isSymbolicLink()) {
+                content = Buffer.from(fs.readlinkSync(fullPath));
+            } else {
+                content = fs.readFileSync(fullPath)
+            }
             const header = `blob ${content.length}\0`
             const store = Buffer.concat([Buffer.from(header), content])
             const hash = crypto.createHash('sha1').update(store).digest('hex')
@@ -160,7 +170,7 @@ function status() {
     for (const [filePath, fileInfo] of Object.entries(indexFiles)) {
         if (commitedFiles[filePath]) {
             // File exist in commit 
-            if (commitedFiles[filePath] !== fileInfo.hash) {
+            if (commitedFiles[filePath].hash !== fileInfo.hash) {
                 stagedModified.push(filePath)
             }
         } else  {

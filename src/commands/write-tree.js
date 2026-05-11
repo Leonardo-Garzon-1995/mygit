@@ -46,10 +46,10 @@ function writeTree(dir=process.cwd()) {
     for (const name of filteredEntries) {
         const fullPath = path.join(dir, name)
         // Get file stats (size, permissions, type, etc)
-        const stats = fs.statSync(fullPath)
+        const stats = fs.lstatSync(fullPath)
 
         // Determine the mode
-        const mode = getFileMode(fullPath, stats)
+        const mode = getFileMode(fullPath)
 
         let hash;
 
@@ -62,11 +62,16 @@ function writeTree(dir=process.cwd()) {
             // This is how Git represents nested directories — trees pointing to trees.
             hash = writeTree(fullPath)
 
-        } else if (stats.isFile()) {
+        } else if (stats.isFile() || stats.isSymbolicLink()) {
             // ─── Hash the file as a blob ──────────────────────────────────────────
       //
       // Read the file content, hash it exactly like hash-object does and store it in .mygit/objects/.
-            const content = fs.readFileSync(fullPath)
+            let content;
+            if (stats.isSymbolicLink()) {
+                content = Buffer.from(fs.readlinkSync(fullPath));
+            } else {
+                content = fs.readFileSync(fullPath)
+            }
             hash = hashObjectContent(content, "blob")
         } else {
             continue

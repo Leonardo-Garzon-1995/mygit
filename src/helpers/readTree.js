@@ -23,7 +23,7 @@ function readTree(treeHash, prefix='') {
             const subfiles = readTree(entry.hash, fullPath)
             Object.assign(files, subfiles)
         } else {
-            files[fullPath] = entry.hash
+            files[fullPath] = { hash: entry.hash, mode: entry.mode }
         }
     }
 

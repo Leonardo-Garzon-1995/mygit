@@ -88,10 +88,14 @@ function updateWorkingDirectory(targetFiles) {
         fs.mkdirSync(dir, { recursive: true });
         }
         
-        fs.writeFileSync(fullPath, content);
-        
-        if (fileInfo.mode === '100755') {
-        fs.chmodSync(fullPath, 0o755);
+        if (fileInfo.mode === '120000') {
+            fs.symlinkSync(content.toString(), fullPath);
+        } else {
+            fs.writeFileSync(fullPath, content);
+            
+            if (fileInfo.mode === '100755') {
+            fs.chmodSync(fullPath, 0o755);
+            }
         }
     }
 }

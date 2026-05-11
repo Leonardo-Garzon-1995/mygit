@@ -112,3 +112,23 @@ test('add . ignores files inside .mygit directory', ()=> {
     assert.strictEqual(index.entries['.mygit/secret'], undefined)
 })
 
+test('add command handles symbolic links', () => {
+    fs.writeFileSync('target.txt', 'target content')
+    fs.symlinkSync('target.txt', 'link.txt')
+
+    add(['link.txt'])
+
+    const indexPath = path.join(baseDir, '.mygit', 'index')
+    const index = JSON.parse(fs.readFileSync(indexPath, 'utf-8'))
+
+    assert.ok(index.entries['link.txt'])
+    assert.strictEqual(index.entries['link.txt'].mode, '120000')
+
+    // hash should match the target path string 'target.txt'
+    const crypto = require('crypto');
+    const header = `blob 10\0`; // "target.txt".length is 10
+    const store = Buffer.concat([Buffer.from(header), Buffer.from('target.txt')]);
+    const expectedHash = crypto.createHash('sha1').update(store).digest('hex');
+    assert.strictEqual(index.entries['link.txt'].hash, expectedHash);
+})
+

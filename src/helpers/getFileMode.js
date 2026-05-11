@@ -9,9 +9,12 @@ const fs = require('fs')
  */
 function getFileMode(filePath) {
 
-    if (!fs.existsSync(filePath)) return "" 
-
-    const stats = fs.statSync(filePath)
+    let stats;
+    try {
+        stats = fs.lstatSync(filePath)
+    } catch (err) {
+        return ""
+    }
 
     if (stats.isDirectory()) {
         return '40000'

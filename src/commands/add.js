@@ -28,25 +28,31 @@ function addFile(filePath) {
 
     const absolutePath = path.resolve(filePath)
 
-    if (!fs.existsSync(absolutePath)) {
+    let stats;
+    try {
+        stats = fs.lstatSync(absolutePath)
+    } catch (e) {
         console.error(`fatal: pathspec '${filePath}' did not match any files`)
         return
     }
-
-    const stats = fs.statSync(absolutePath)
 
     if (stats.isDirectory()) {
         console.error(`fatal: '${filePath}' is a directory. Use 'mygit add ${filePath}/*' or add files individually`)
         return
     }
 
-    if (!stats.isFile()) {
-        console.error(`fatal: '${filePath}' is not a regular file`);
+    if (!stats.isFile() && !stats.isSymbolicLink()) {
+        console.error(`fatal: '${filePath}' is not a regular file or symbolic link`);
         return
     }
 
     // read and hash the file
-    const content = fs.readFileSync(absolutePath)
+    let content;
+    if (stats.isSymbolicLink()) {
+        content = Buffer.from(fs.readlinkSync(absolutePath));
+    } else {
+        content = fs.readFileSync(absolutePath)
+    }
     const hash = hashObjectContent(content, 'blob')
     const mode = getFileMode(absolutePath)
 
@@ -71,12 +77,13 @@ function addFile(filePath) {
 function addDirectory(dirPath) {
     const absolutePath = path.resolve(dirPath)
 
-    if (!fs.existsSync(absolutePath)) {
+    let stats;
+    try {
+        stats = fs.lstatSync(absolutePath)
+    } catch (e) {
         console.error(`fatal: pathspec '${dirPath}' did not match any files`);
         return
     }
-
-    const stats = fs.statSync(absolutePath)
 
     if (!stats.isDirectory()) {
         console.error(`fatal: '${dirPath}' is not a directory`);
@@ -94,7 +101,12 @@ function addDirectory(dirPath) {
             if (entry === '.mygit') continue
 
             const fullPath = path.join(currentDir, entry)
-            const stats = fs.statSync(fullPath)
+            let stats;
+            try {
+                stats = fs.lstatSync(fullPath)
+            } catch (e) {
+                continue;
+            }
 
             // Skip ignored files
             if (isIgnored(fullPath, mygitignorePatterns)) {
@@ -103,7 +115,7 @@ function addDirectory(dirPath) {
 
             if (stats.isDirectory()) {
                 traverse(fullPath)
-            } else if (stats.isFile()) {
+            } else if (stats.isFile() || stats.isSymbolicLink()) {
                 const added = addFile(fullPath)
                 addedFiles.push(added)
             }
@@ -141,12 +153,13 @@ function add(args) {
         } else {
             const absolutePath = path.resolve(arg)
 
-            if (!fs.existsSync(absolutePath)) {
+            let stats;
+            try {
+                stats = fs.lstatSync(absolutePath)
+            } catch (e) {
                 console.error(`fatal: pathspec '${arg}' did not match any files`);
                 return
             }
-
-            const stats = fs.statSync(absolutePath)
 
             if (stats.isDirectory()) {
                 addDirectory(absolutePath)
