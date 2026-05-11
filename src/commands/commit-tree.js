@@ -1,35 +1,17 @@
-// THE COMMIT-TREE COMMAND 
 /* COMMIT TREE FORMAT
 commit <size>\0tree <tree hash>
 parent <parent hash>
 author <name> <email> <timestamp> <timezone>
 commiter <name> <email> <timestamp> <timezone>
 
-<commit message>*/
+<commit message>
+*/
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
 const zlib = require('zlib')
 
-function hashObjectContent(content, type='blob') {
-    const header = `${type} ${content.length}\0`
-    const store = Buffer.concat([Buffer.from(header), content])
-    const hash = crypto.createHash('sha1').update(store).digest('hex')
-    const compressed = zlib.deflateSync(store)
-
-    const dir = hash.slice(0, 2)
-    const file = hash.slice(2)
-    const objDir = path.join(process.cwd(), '.mygit', 'objects', dir)
-    const objPath = path.join(objDir, file)
-
-    fs.mkdirSync(objDir, {recursive: true})
-
-    if (!fs.existsSync(objPath)) {
-        fs.writeFileSync(objPath, compressed)
-    }
-
-    return hash
-}
+const hashObjectContent = require('../helpers/hashObjectContent')
 
 /**
  * Builds and stores a commit object for a tree, including author metadata and optional parent commits.
@@ -51,9 +33,7 @@ function commitTree(treeHash, message, parentHash = null) {
         process.exit(1)
     }
 
-    // 2. Get author info
-    // We will implement a config feature later on 
-    // For now well jus use enviroment variables or defaults
+    // Need to implement configure file laer
     const authorName = process.env.MYGIT_AUTHOR_NAME || 'Leonardo Garzon'
     const authorEmail = process.env.MYGIT_AUTHOR_EMAIL || 'example@gmail.com'
     const committerName = authorName
@@ -88,13 +68,6 @@ function commitTree(treeHash, message, parentHash = null) {
     commitContent += `author ${authorName} <${authorEmail}> ${timestamp} ${timezone}\n`
     commitContent += `committer ${committerName} <${committerEmail}> ${timestamp} ${timezone}\n`
     commitContent += `\n${message}\n`
-
-    // 5. Hash and store the commit object
-    // This is the same process as blobs and trees:
-    //   - Prepend header: "commit <size>\0"
-    //   - Hash it with SHA-1
-    //   - Compress with zlib
-    //   - Store in .mygit/objects/
 
     const commitHash = hashObjectContent(Buffer.from(commitContent), 'commit')
 

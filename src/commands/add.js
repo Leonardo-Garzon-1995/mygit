@@ -4,31 +4,13 @@ const path = require('path')
 
 const getFileMode =  require('../helpers/getFileMode')
 const hashObjectContent = require('../helpers/hashObjectContent')
-const readIndex = require('../helpers/readIndex')
+const { getIndexPath, readIndex, writeIndex } = require('../core/index')
 const { getMygitignorePatterns, isIgnored } = require('../utils/mygitignore')
 const { ensureRepo } = require('../core/repository')
-
-function getIndexPath() {
-    return path.join(process.cwd(), '.mygit', 'index')
-}
-
-function writeIndex(index) {
-    const indexPath = getIndexPath()
-
-    try {
-        fs.writeFileSync(indexPath, JSON.stringify(index, null, 2))
-    } catch (error) {
-        console.error('error: unable to write index');
-        console.error(error.message);
-        process.exit(1);
-    }
-}
-
 
 function normalizePath(filePath) {
     // Normialize path to use foward slashes
 
-    // Convert to relative path from repo 
     const repoRoot = process.cwd()
     const absolutePath = path.resolve(filePath)
 

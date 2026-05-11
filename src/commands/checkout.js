@@ -4,6 +4,7 @@ const path = require('path');
 const getCurrentBranch = require('../helpers/getCurrentBranch')
 const readObject = require('../helpers/readObject')
 const parseTree = require('../helpers/parseTree')
+const { getRepoPath, ensureRepo } = require("../core/repository")
 
 function readTree(treeHash, prefix = '') {
     const { content } = readObject(treeHash);
@@ -104,12 +105,9 @@ function updateWorkingDirectory(targetFiles) {
 function checkout(args) {
 
     // --1. Check if you are in a mygit repo
-    const mygitDir = path.join(process.cwd(), '.mygit');
+    const mygitDir = getRepoPath();
     
-    if (!fs.existsSync(mygitDir)) {
-        console.error('fatal: not a mygit repository');
-        process.exit(1);
-    }
+    ensureRepo()
 
     // --2. Parse arguments
     
