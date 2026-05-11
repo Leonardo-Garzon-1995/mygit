@@ -7,8 +7,6 @@ const readObject = require('../helpers/readObject')
 const checkoutCommit = require('../helpers/checkoutCommit')
 const { getRepoPath } = require('../core/repository')
 const { getHEADCommit, updateHEADCommit } = require('../core/refs')
-const { timeStamp } = require('console')
-const { monitorEventLoopDelay } = require('perf_hooks')
 
 function getStashPath() {
     return path.join(getRepoPath(), 'refs', 'stash.json')

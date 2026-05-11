@@ -2,7 +2,6 @@ const fs = require('fs')
 const path = require('path')
 
 const { getRepoPath } = require('./repository')
-const { ref } = require('process')
 
 function getHEADPath() {
     return path.join(getRepoPath(), 'HEAD')
@@ -17,6 +16,7 @@ function readHEAD() {
 
     return fs.readFileSync(headPath, 'utf-8').trim()
 }
+
 
 /**
  * Returns:
@@ -93,6 +93,8 @@ function deleteRef(refPath) {
 }
 
 module.exports = {
+    getHEADPath,
+    readHEAD,
     getHEADCommit,
     updateHEADCommit,
     readRef,
