@@ -10,29 +10,7 @@ const getCurrentCommit = require('../helpers/getCurrentCommit')
 const readIndex = require('../helpers/readIndex')
 const { ensureRepo } = require('../core/repository')
 const { getMygitignorePatterns, isIgnored} = require('../utils/mygitignore')
-
-function readTree(treeHash, prefix='') {
-    // Recursively read a tree and return all the files
-    // Returns: { 'path/to/file.txt': 'blob-hash', ... }
-
-    const { content } = readObject(treeHash)
-    const entries = parseTree(content)
-
-    const files = {}
-
-    for (const entry of entries) {
-        const fullPath = prefix ? path.join(prefix, entry.name).split(path.sep).join('/') : entry.name
-
-        if (entry.mode === "40000") {
-            const subfiles = readTree(entry.hash, fullPath)
-            Object.assign(files, subfiles)
-        } else {
-            files[fullPath] = entry.hash
-        }
-    }
-
-    return files
-}
+const readTree = require('../helpers/readTree')
 
 function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.cwd(), mygitignorePatterns = null, indexEntries = {}) {
     // ─── Get all files in working directory with their hashes ───────────────
@@ -86,9 +64,6 @@ function getWorkingDirectoryFiles(baseDir = process.cwd(), currentDir = process.
  */
 function status() {
     // 1. Check if in a mygit repo
-
-    const mygitDir = path.join(process.cwd(), '.mygit')
-
     ensureRepo()
 
     // 2. Get current branch

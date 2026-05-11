@@ -13,29 +13,7 @@ const fs = require('fs')
 const path = require('path')
 
 const hashObjectContent = require('../helpers/hashObjectContent')
-
-// GET FILE MODE
-/*
-mode values:
-040000 — directory (tree)
-100644 — regular non-executable file
-100755 — executable file
-120000 — symbolic link
-fs.statSync() gives us stats.mode which is a number. We check the bits
-to determine the type and executable status.
- */
-
-function getMode(filePath, stats) {
-    if (stats.isDirectory()) {
-        return '40000'
-    }
-    if (stats.isSymbolicLink()) {
-        return '120000'
-    }
-
-    const isExecuatble = (stats.mode & 0o111) !== 0
-    return isExecuatble ? '100755' : '100644'
-}
+const getFileMode = require('../helpers/getFileMode')
 
 
 /**
@@ -71,7 +49,7 @@ function writeTree(dir=process.cwd()) {
         const stats = fs.statSync(fullPath)
 
         // Determine the mode
-        const mode = getMode(fullPath, stats)
+        const mode = getFileMode(fullPath, stats)
 
         let hash;
 
@@ -87,7 +65,7 @@ function writeTree(dir=process.cwd()) {
         } else if (stats.isFile()) {
             // ─── Hash the file as a blob ──────────────────────────────────────────
       //
-      // Read the file content and hash it exactly like hash-object does.
+      // Read the file content, hash it exactly like hash-object does and store it in .mygit/objects/.
             const content = fs.readFileSync(fullPath)
             hash = hashObjectContent(content, "blob")
         } else {

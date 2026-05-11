@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const readIndex = require('../helpers/readIndex')
+const { readIndex } = require('../core/index')
 const { ensureRepo } = require('../core/repository')
 
 /**

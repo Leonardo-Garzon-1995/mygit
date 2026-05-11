@@ -11,62 +11,16 @@ const zlib = require('zlib')
 
 const colors  = require('../utils/colors')
 const readObject = require('../helpers/readObject')
+const parseCommit = require('../helpers/parseCommit')
+const { getRepoPath, ensureRepo } = require('../core/repository')
 
-function parseCommit(content) {
-    // 1. Parse the commit's object content into structured data
-    /*COMMIT FORMAT
-        tree <hash>
-        parent <hash> (if parent)
-        author <name> <email> <timestamp> <timezone>
-        
-        <commit message>
-    */
-    const lines = content.toString().split('\n') // Array of lines with the commit content
-    const commit = {
-        tree: null,
-        parents: [],
-        author: null,
-        committer: null,
-        message: null
-    }
-
-    // Keep track of the lines index
-    let i = 0
-
-    
-    // 2. Parse header lines (tree, parent, author, commiter)
-    while (i < lines.length && lines[i] !== '') {
-        const line = lines[i]
-
-        if (line.startsWith('tree ')) {
-            commit.tree = line.substring(5)
-        } else if (line.startsWith('parent ')) {
-            commit.parents.push(line.substring(7))
-        } else if (line.startsWith('author ')) {
-            commit.author = line.substring(7)
-        } else if (line.startsWith('committer ')) {
-            commit.committer = line.substring(10)
-        }
-
-        i++
-    }
-
-    // skip the blank line 
-    i++
-
-    // Everything else is the commit message
-    commit.message = lines.slice(i).join('\n').trim()
-
-    // Return the parsed commit object
-    return commit
-}
 
 function formatCommit(hash, commit, isShort=false) {
     // FORMAT A COMMIT FOR DISPLAY
 
     if (isShort) {
         // Short format: just hash and message (like git log --oneline)
-        return `${hash.slice(0, 7)} ${commit.message.split('\n')[0]}`
+        return `${colors.yellow}${hash.slice(0, 7)}${colors.reset} ${commit.message.split('\n')[0]}`
     }
 
     // Full format: hash, author, date, message (like git log)
@@ -108,14 +62,11 @@ function formatCommit(hash, commit, isShort=false) {
  */
 function log(options = {}) {
     // 1. Check if we're in a mygit repository
-    const gitDir = path.join(process.cwd(), '.mygit')
-    if (!fs.existsSync(gitDir)) {
-        console.error('fatal: not a mygit repository')
-        process.exit(1)
-    }
+    const mygitDir = getRepoPath()
+    ensureRepo()
 
     // 2. Read HEAD to find the current branch
-    const headPath = path.join(gitDir, 'HEAD')
+    const headPath = path.join(mygitDir, 'HEAD')
     if (!fs.existsSync(headPath)) {
         console.error('Error: HEAD file not found')
         process.exit(1)
@@ -130,7 +81,7 @@ function log(options = {}) {
     const branchRef = headContent.substring(5) // Remove 'ref: ' prefix
 
     // 3. Read the branch reference to get the latest commit hash
-    const branchPath = path.join(gitDir, branchRef)
+    const branchPath = path.join(mygitDir, branchRef)
     if (!fs.existsSync(branchPath)) {
         console.log('No commits yet')
         return
