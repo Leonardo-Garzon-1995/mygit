@@ -52,6 +52,8 @@ function captureBranch(args) {
     return { ...result, output: stripAnsi(result.output) }
 }
 
+console.log('\nTESTING BRANCH\n')
+
 test('branch lists the current branch with a marker', () => {
     seedBranch('main', writeCommit('initial commit'))
 

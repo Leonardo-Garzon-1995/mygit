@@ -110,28 +110,32 @@ test('status shows unstaged deleted files', () => {
     assert.match(output, /deleted:\s+deleted\.txt/i)
 })
 
-test('status reports symlinks correctly', () => {
-    // 1. Untracked symlink
-    const targetPath = path.join(baseDir, 'target.txt')
-    const linkPath = path.join(baseDir, 'link.txt')
-    fs.writeFileSync(targetPath, 'hello')
-    fs.symlinkSync('target.txt', linkPath)
+if (process.platform !== 'win32') {
+    test('status reports symlinks correctly', () => {
+        // 1. Untracked symlink
+        const targetPath = path.join(baseDir, 'target.txt')
+        const linkPath = path.join(baseDir, 'link.txt')
+        fs.writeFileSync(targetPath, 'hello')
+        fs.symlinkSync('target.txt', linkPath)
 
-    let output = run('mygit status')
-    assert.match(output, /Untracked files:/i)
-    assert.match(output, /link\.txt/)
+        let output = run('mygit status')
+        assert.match(output, /Untracked files:/i)
+        assert.match(output, /link\.txt/)
 
-    // 2. Staged symlink
-    run(`mygit add link.txt`)
-    output = run('mygit status')
-    assert.match(output, /Changes to be committed:/i)
-    assert.match(output, /new file:\s+link\.txt/)
+        // 2. Staged symlink
+        run(`mygit add link.txt`)
+        output = run('mygit status')
+        assert.match(output, /Changes to be committed:/i)
+        assert.match(output, /new file:\s+link\.txt/)
 
-    // 3. Modified symlink
-    run(`mygit commit -m "add symlink"`)
-    fs.unlinkSync(linkPath)
-    fs.symlinkSync('other.txt', linkPath) // Modify symlink target
-    output = run('mygit status')
-    assert.match(output, /Changes not staged for commit:/i)
-    assert.match(output, /modified:\s+link\.txt/)
-})
+        // 3. Modified symlink
+        run(`mygit commit -m "add symlink"`)
+        fs.unlinkSync(linkPath)
+        fs.symlinkSync('other.txt', linkPath) // Modify symlink target
+        output = run('mygit status')
+        assert.match(output, /Changes not staged for commit:/i)
+        assert.match(output, /modified:\s+link\.txt/)
+    })
+}
+
+
