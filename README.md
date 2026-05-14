@@ -157,12 +157,7 @@ Mygit is an experimental project and is still in development and by no means it 
 
 ## Contributing
 
-Contributions are welcome! Areas for improvement:
-
-- Additional Git commands (merge, rebase, etc.)
-- Performance optimizations
-- Better error handling
-- More comprehensive tests
+Read the [contribution](CONTRIBUTING.md) guidelines on how to contribute to this project.
 
 ## License
 
