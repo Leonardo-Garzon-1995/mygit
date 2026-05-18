@@ -94,10 +94,10 @@ function writeTreeFromIndex(entries, prefix='') {
  */
 function commit(message) {
     // 1. Validate Messalge
-    if(!message) {
-        console.error('Error: commit message required')
-        console.error('Usage: mygit commit -m <message>')
-        process.exit(1)
+    if (!message || !message.trim()) {
+        console.error('Error: Commit message cannot be empty.');
+        console.error('Usage: mygit commit -m <message>');
+        process.exit(1);
     }
 
     // Check if you're in a mygit repository

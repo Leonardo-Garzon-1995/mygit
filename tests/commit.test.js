@@ -88,6 +88,32 @@ test('commit shows error when no message provided', () => {
     process.exit = originalExit
 })
 
+test('commit shows error when message is whitespace only', () => {
+    fs.writeFileSync(path.join(baseDir, 'test.txt'), 'content')
+    addToIndex('test.txt')
+
+    const originalExit = process.exit
+    let exitCode
+
+    process.exit = (code) => {
+        exitCode = code
+        throw new Error('EXIT')
+    }
+
+    const output = captureOutput(() => {
+        try {
+            commit(' ')
+        } catch (err) {
+            // expected due to mocked process.exit throwing
+        }
+    })
+
+    assert.match(output, /Error: Commit message cannot be empty\./)
+    assert.strictEqual(exitCode, 1)
+
+    process.exit = originalExit
+})
+
 test('commit shows error when not in a mygit repository', () => {
     fs.rmSync(path.join(baseDir, '.mygit'), { recursive: true, force: true })
     
