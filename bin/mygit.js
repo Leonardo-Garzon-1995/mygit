@@ -124,16 +124,12 @@ const commands = {
         modulePath: path.join(__dirname, '..', 'src', 'commands', 'stash'),
         handler: function(args) { require(this.modulePath)(args)}
     },
+    'ignore': {
+        modulePath: path.join(__dirname, '..', 'src', 'commands', 'ignore'),
+        handler: function(args) { require(this.modulePath) (args)}
+    },
 
     // THIS SECTION IS FOR TESTING PURPUSES ONLY - NOT REAL COMMANDS
-    'test': {
-        module: path.join(__dirname, '..', 'test'),
-        handler: function(args) { require(this.module) (args) }
-    },
-    'test2': {
-        module: path.join(__dirname, '..', 'secondTest'),
-        handler: function (args)  { require(this.module) (args) }
-    },
     'ins-obj': {
         module: path.join(__dirname, '..', 'tests', 'inspect-object'),
         handler: function(args)  { require(this.module) (args[0])}
