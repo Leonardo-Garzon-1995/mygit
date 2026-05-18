@@ -1,8 +1,6 @@
 const path = require('path')
 const fs = require('fs')
 
-const logger = require('../utils/logger')
-
 const { ensureRepo } = require('../core/repository')
 
 function getMygitignorePath() {
@@ -14,9 +12,6 @@ function ensureMygitignoreFile() {
 
     const fd = fs.openSync(mygitignorePath, 'a') 
     fs.closeSync(fd)
-    // if (!fs.existsSync(mygitignorePath)) {
-    //     fs.writeFileSync(mygitignorePath, '')
-    // }
 }
 
 function writeToMygitignoreFile(filename) {
@@ -52,8 +47,33 @@ function listPatternsInFile() {
     }
 }
 
-function removePatternFromFile(filename) {
-    throw new Error('Not implemented yet')
+function removePatternFromFile(pattern) {
+    if (!pattern) {
+        console.log(`usage: mygit ignore --remove <pattern>`)
+        return
+    }
+
+    const mygitignorePath = getMygitignorePath()
+    const content = fs.readFileSync(mygitignorePath, 'utf-8')
+    const lines = content.split('\n')
+
+    const target = pattern.trim()
+    let found = false
+    const remaining = lines.filter(line => {
+        if (line.trim() === target) {
+            found = true
+            return false
+        }
+        return true
+    })
+
+    if (!found) {
+        console.log(`pattern '${target}' not found in .mygitignore`)
+        return
+    }
+
+    fs.writeFileSync(mygitignorePath, remaining.join('\n'))
+    console.log(`pattern '${target}' removed from .mygitignore`)
 }
 
 function removeAllPatternsFromFile() {
