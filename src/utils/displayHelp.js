@@ -23,6 +23,7 @@ function displayHelp(command="") {
     console.log('   tag'.padEnd(16) + 'Manage tags')
     console.log('   diff'.padEnd(16) + 'Show changes between commits, the staging area, and the working tree')
     console.log('   stash'.padEnd(16) + 'Stash changes in a dirty working directory away')
+    console.log(`   ignore`.padEnd(16) + `manage '.mygitignore' file`)
     console.log(`   inspect-object`.padEnd(18) + 'Show detailed info about a mygit object')
     console.log('')
     console.log('   help, -h'.padEnd(16) + 'Display this help message')
@@ -68,6 +69,9 @@ function getCommandHelp(command) {
         case 'stash':
             stashHelp()
             break;
+        case 'ignore':
+            ignoreHelp()
+            break
         default:
             console.log('   Unknown command')
             break
@@ -178,6 +182,16 @@ function stashHelp() {
     console.log('   stash drop'.padEnd(18) + 'Remove the most recent stashed changes')
     console.log('   stash apply'.padEnd(18) + 'Apply stashed changes without removing them from the stash')
     console.log('')
+}
+
+function ignoreHelp() {
+    console.log('')
+    console.log('   ignore [<pattern>/<flags>]'.padEnd(23) + "Manage '.mygitignore' file\n")
+    console.log('   ignore <pattern>'. padEnd(23) + "Add a pattern to '.mygitignore' file")
+    console.log('   flags:')
+    console.log('   --list'.padEnd(23) + "list all patterns tracked by '.mygitignore'")
+    console.log('   --remove <pattern>'.padEnd(23)  + "Remove an specific pattern from '.mygitignore'")
+    console.log('   --remove-all'.padEnd(23) + "remove all contents form '.mygitignore")
 }
 
 module.exports = displayHelp
