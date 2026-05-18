@@ -52,7 +52,7 @@ function listPatternsInFile() {
     }
 }
 
-function removePatternFromFile(filename) {
+function removePatternFromFile(filenam) {
     throw new Error('Not implemented yet')
 }
 
