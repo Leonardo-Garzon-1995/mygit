@@ -5,6 +5,12 @@ This project is a simplified Git implementation built in Node.js, focused on und
 
 ---
 
+>⚠️ Major Refactor In Progress
+>
+> The project architecture has recently changed.
+> Contributors should read the discussion below before opening PRs:
+> [Discussion: Refactor Repository Structure](https://github.com/Leonardo-Garzon-1995/mygit/discussions/45)
+
 ## Project Goals
 
 mygit aims to:

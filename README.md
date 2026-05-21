@@ -1,5 +1,11 @@
 # Mygit
 
+>⚠️ Major Refactor In Progress
+>
+> The project architecture has recently changed.
+> Contributors should read the discussion below before opening PRs:
+> [Discussion: Refactor Repository Structure](https://github.com/Leonardo-Garzon-1995/mygit/discussions/45)
+
 A simple version control system (git-like) implemented in JavaScript. This project implements core Git functionality including repository initialization, staging, committing, branching, and more.
 
 ## Features
@@ -23,6 +29,7 @@ Mygit supports the following commands:
 - **`diff`** - Show changes between commits, commit and working tree, or index and working tree
 - **`stash`** - Stash changes in a dirty working directory away
 - **`ignore`** - Manage `.mygitignore` file from the command line 
+- **`rm`** - Remove files from the working tree and from the index
 
 Other features include:
 - Support for `.mygitignore` files to exclude files from staging, status and diff operations
