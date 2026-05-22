@@ -1,5 +1,5 @@
-const fs = require('fs')
-const path = require('path')
+const Repository = require('../core/repository/repository')
+const logger = require('../utils/logger')
 
 /**
  * Creates the .mygit directory structure and initial HEAD file in the target directory.
@@ -7,31 +7,17 @@ const path = require('path')
  * @param {string} [targetDir=process.cwd()] - Directory where the .mygit repository should be created
  * @throws {Error} If repository initialization fails
  */
-function mygitInit(targetDir=process.cwd()) {
-    const mygitDir = path.join(targetDir, ".mygit")
-    const objectsDir = path.join(mygitDir, "objects")
-    const refsDir = path.join(mygitDir, "refs")
-    const headsDir = path.join(refsDir, 'heads')
-    const headFile = path.join(mygitDir, 'HEAD')
-
-    
+function initCommand(targetDir=process.cwd()) {
     try {
-        if (fs.existsSync(mygitDir)) {
-            console.log("A '.mygit' directory already exists inside this folder.")
-            return
-        }
-        fs.mkdirSync(mygitDir, {recursive: true})
-        fs.mkdirSync(objectsDir, {recursive: true})
-        fs.mkdirSync(refsDir, {recursive: true})
-        fs.mkdirSync(headsDir, {recursive: true})
+        const repo = Repository.init()
 
-        fs.writeFileSync(headFile, 'ref: refs/heads/main\n')
+        console.log(`Initialized empty mygit repository in ${repo.mygitDir}`)
+        logger.info(`Initialized empty mygit repository in ${repo.mygitDir}`)
 
-        console.log(`Initialized empty mygit repository in ${mygitDir}`)
     } catch (error) {
-        throw new Error(`Init failed: ${error.message}`)
+        console.error(`Error: ${error.message}`)
+        logger.error(error.stack)
     }
-
 }
 
-module.exports = mygitInit
+module.exports = initCommand
