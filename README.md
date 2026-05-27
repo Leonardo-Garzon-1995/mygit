@@ -123,6 +123,10 @@ mygit commit-tree <tree-hash> -m "Commit message" -p <parent-commit-optional>
 
 ## Project Structure
 
+>⚠️ Major Refactor In Progress
+>
+> Go to the [discussion](https://github.com/Leonardo-Garzon-1995/mygit/discussions/45) to see the final structure for the refactor
+
 ```
 mygit/
 ├── bin/
