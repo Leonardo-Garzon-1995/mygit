@@ -1,6 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 
+const logger = require('../utils/logger')
 const { ensureRepo } = require('../core/repository')
 
 function getMygitignorePath() {
@@ -14,13 +15,13 @@ function ensureMygitignoreFile() {
     fs.closeSync(fd)
 }
 
-function writeToMygitignoreFile(filename) {
-    if (!filename) {
+function writeToMygitignoreFile(pattern) {
+    if (!pattern) {
         return
     }
 
     const mygitignorePath = getMygitignorePath()
-    const entry = filename.trim() + '\n'
+    const entry = pattern.trim() + '\n'
 
     fs.appendFileSync(mygitignorePath, entry)
 }
@@ -43,8 +44,9 @@ function listPatternsInFile() {
     for (const p of patterns) {
         if (p === '') continue
         console.log(`- ${p}`)
-        console.log('')
     }
+
+    console.log('')
 }
 
 function removePatternFromFile(pattern) {
@@ -86,16 +88,22 @@ function ignore(args=[]) {
     ensureRepo()
     ensureMygitignoreFile()
 
-
-    if (args[0] === '--list') {
+    try {
+        if (args[0] === '--list') {
         listPatternsInFile()
-    } else if (args[0] === '--remove') {
-        removePatternFromFile(args[1])
-    } else if (args[0] === '--remove-all') {
-        removeAllPatternsFromFile()
-    } else {
-        writeToMygitignoreFile(args[0])
+        } else if (args[0] === '--remove') {
+            removePatternFromFile(args[1])
+        } else if (args[0] === '--remove-all') {
+            removeAllPatternsFromFile()
+        } else {
+            writeToMygitignoreFile(args[0])
+        }
+    } catch (error) {
+        logger.error(error.stack)
+        console.error(`Error: ${error.message}`)
+        return
     }
+    
     
 }
 
