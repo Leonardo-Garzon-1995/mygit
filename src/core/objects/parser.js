@@ -111,6 +111,49 @@ function parseTree(content) {
     return entries;
 }
 
+function parseTag(content) {
+    if (!content || !Buffer.isBuffer(content)) {
+        throw new InvalidObjectError('Content must be a buffer')
+    }
+
+    const lines = content.toString().split('\n')
+
+    const tag  = {
+        object: null,
+        type: null,
+        tag: null,
+        tagger: null,
+        message: ''
+    }
+
+    let inMessage = false
+
+    for (const line of lines) {
+        if (!inMessage) {
+            if (line === '') {
+                inMessage = true
+                continue
+            }
+
+            if (line.startsWith('object ')) {
+                tag.object = line.substring(7)
+            } else if (line.startsWith('type ')) {
+                tag.type = line.substring(5)
+            } else if (line.startsWith('tag ')) {
+                tag.tag = line.substring(4)
+            } else if (line.startsWith('tagger ')) {
+                tag.tagger = line.substring(7)
+            } 
+        } else {
+            tag.message += line + '\n'
+        }
+    }
+
+    tag.message = tag.message.trimEnd()
+
+    return tag
+}
+
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
@@ -176,7 +219,7 @@ function parseObjectContent(type, content) {
  */
 function parseSignature(signature) {
     const match = signature.match(
-        /^(.*?) <(.*?)> (\d+) ([+-]\d+)$/
+        /^(.*?) <(.*?)> (\d+) ([+-]\d{4})$/
     )
 
     if (!match) {
@@ -194,9 +237,9 @@ function parseSignature(signature) {
 // To add later
 
 /*
-parseTag()
 parseCommitMessage()
  */
+
 
 module.exports = {
     parseCommit,
