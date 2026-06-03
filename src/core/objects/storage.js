@@ -1,10 +1,11 @@
 
 const fs = require('../../utils/filesystem')
-// writeFileBuffer, readFileBuffer, ensureDir, exists
-const { ObjectNotFoundError, InvalidObjectError } = require('../../errors')
+const path = require('../../utils/paths')
 const { compress, decompress } = require('../../utils/compression')
 const { sha1 } = require('../../utils/hash')
 const { objectPath } = require('../repository/paths')
+const { ObjectNotFoundError, InvalidObjectError } = require('../../errors')
+const Repository = require('../repository/repository')
 
 /**
  * Serialize mygit object.
@@ -45,10 +46,10 @@ function parseObject(data) {
 
 /**
  * Write mygit object
- * @param {*} repo 
- * @param {*} type 
+ * @param {Repository} repo 
+ * @param {string} type 
  * @param {*} content 
- * @returns 
+ * @returns {String} 
  */
 function writeObject(repo, type, content) {
     const serialized = serializeObject(type, content)
@@ -58,7 +59,7 @@ function writeObject(repo, type, content) {
     const filePath = objectPath(repo, hash)
 
     if (!fs.exists(filePath)) {
-        fs.ensureDir(fs.dirname(filePath))
+        fs.ensureDir(path.dirname(filePath))
 
         const compressed = compress(serialized)
 
@@ -69,10 +70,11 @@ function writeObject(repo, type, content) {
 }
 
 /**
- * Read mygit object
- * @param {*} repo 
- * @param {*} hash 
- * @returns 
+ * Read and parse a mygit object 
+ * 
+ * @param {Repository} repo 
+ * @param {String} hash 
+ * @returns {Object}
  */
 function readObject(repo, hash) {
     const filePath = objectPath(repo, hash)
