@@ -51,13 +51,16 @@ function isValidRef(ref) {
  * @returns {boolean}
  */
 function isValidBranchName(name) {
-    if (typeof name !== 'string') return false;
+    if (typeof name !== 'string' || name.trim() == '') return false;
     if (name.trim() === '') return false;
     if (name.includes(' ')) return false;
     if (name.includes('..')) return false;
     if (name.includes('~')) return false;
     if (name.includes('^')) return false;
     if (name.includes(':')) return false;
+    if (name.includes('*')) return false;
+    if (name.includes('[')) return false;
+    if (name.includes('\\')) return false;
     return true;
 }
 
@@ -87,10 +90,25 @@ function assertRequired(value, message) {
     }
 }
 
+function isValidTagName(tagName) {
+        assertRequired(tagName)
+
+        const invalid = ['..', '~', '^', ':', '?', '*', '[', '\\']
+
+        for (const token of invalid) {
+            if (tagName.includes(token)) {
+                return false
+            }
+        }
+    
+        return true
+}
+
 module.exports = {
     isValidHash,
     isValidObjectType,
     isValidRef,
+    isValidTagName,
     isValidBranchName,
     isValidPath,
     assertRequired
