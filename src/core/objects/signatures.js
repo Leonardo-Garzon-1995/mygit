@@ -1,5 +1,21 @@
 const { InvalidObjectError } = require('../../errors')
 
+function createSignature(name, email) {
+    const timezoneOffset = -new Date().getTimezoneOffset()
+    const hours = Math.floor(Math.abs(timezoneOffset) / 60)
+    const minutes = Math.abs(timezoneOffset) % 60
+    const sign = timezoneOffset >= 0 ? '+' : '-'
+
+    const timezone = `${sign}${String(hours).padStart(2, '0')}${String(minutes).padStart(2, '0')}`
+
+    return {
+        name,
+        email,
+        timestamp: Math.floor(Date.now() / 1000),
+        timezone: timezone
+    }
+}
+
 function formatSignature(signature) {
     return (
         `${signature.name} ` +
@@ -32,9 +48,9 @@ function parseSignature(signature) {
     }
 }
 
-// Implement validateSignature() later
 
 module.exports = {
+    createSignature,
     formatSignature,
     parseSignature
 }
