@@ -245,6 +245,7 @@ parseCommitMessage()
 module.exports = {
     parseCommit,
     parseTree,
+    parseTag,
     parseObjectByHash,
     parseSignature,
     parseObjectContent
