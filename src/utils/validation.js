@@ -77,19 +77,11 @@ function isValidPath(filePath) {
 }
 
 /**
- * Throws an error if a required value is missing.
+ * Checks weather a tag name is valid
  * 
- * @param {any} value
- * @param {string} message
+ * @param {string} tagName 
+ * @returns {boolean}
  */
-function assertRequired(value, message) {
-    if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) {
-        const error = new Error(message || 'Required value is missing');
-        error.name = 'ValidationError';
-        throw error;
-    }
-}
-
 function isValidTagName(tagName) {
         assertRequired(tagName)
 
@@ -104,6 +96,34 @@ function isValidTagName(tagName) {
         return true
 }
 
+/**
+ * Checks whether a signature is valid
+ * 
+ * @param {string} signature 
+ * @returns {boolean}
+ */
+function isValidSignature(signature) {
+    if (typeof signature !== 'string') return false;
+    
+    return /^(.*?) <(.*?)> (\d+) ([+-]\d{4})$/.test(signature)
+}
+
+/**
+ * Throws an error if a required value is missing.
+ * 
+ * @param {any} value
+ * @param {string} message
+ */
+function assertRequired(value, message) {
+    if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) {
+        const error = new Error(message || 'Required value is missing');
+        error.name = 'ValidationError';
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     isValidHash,
     isValidObjectType,
@@ -111,5 +131,6 @@ module.exports = {
     isValidTagName,
     isValidBranchName,
     isValidPath,
+    isValidSignature,
     assertRequired
 };
