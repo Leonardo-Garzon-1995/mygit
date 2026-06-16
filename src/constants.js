@@ -12,7 +12,7 @@
 // ── Repository constants ──────────────────────────────────────────────────────
 
 /** Name of the repository metadata directory (equivalent to Git's `.git`). */
-const MYGIT_DIR = '.mygit'
+const MYGITDIR_NAME = '.mygit'
 
 /** Default branch name created on `mygit init`. */
 const DEFAULT_BRANCH = 'main'
