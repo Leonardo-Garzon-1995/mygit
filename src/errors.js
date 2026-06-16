@@ -1,42 +1,61 @@
+class MygitError extends Error {
+  constructor(msg) {
+    super(msg)
+    this.name = this.constructor.name
+  }
+  
+}
+
 class RepositoryNotFoundError extends Error {
   constructor() {
     super('fatal: not a mygit repository')
-    this.name = 'RepositoryNotFoundError'
+    this.name = this.constructor.name
+
+    this.code = 'REPO_NOT_FOUND'
   }
 }
 
 class ObjectNotFoundError extends Error {
   constructor(hash) {
-    super(`Object not found: ${hash}`)
-    this.name = 'ObjectNotFoundError'
+    super(`Object not found: ${hash.slice(0, 8)}...`)
+    this.name = this.constructor.name
+
+    this.code = 'OBJECT_NOT_FOUND'
+    this.hash = hash
   }
 }
 
-class InvalidObjectError extends Error {
+class InvalidObjectError extends MygitError {
   constructor(message = 'Invalid or malformed object') {
     super(message)
-    this.name = 'InvalidObjectError'
+
+    this.code = 'INVALID_OBJECT'
   }
 }
 
-class InvalidReferenceError extends Error {
+class InvalidReferenceError extends MygitError {
   constructor(message = 'Invalid reference or ref format') {
     super(message)
-    this.name = 'InvalidReferenceError'
+    
+    this.code = "INVALID_REFERENCE"
   }
 }
 
 class IndexFormatError extends Error {
   constructor(message = 'Invalid or corrupted index file format') {
     super(message)
-    this.name = 'IndexFormatError'
+    this.name = this.constructor.name
+
+    this.code = 'INVALID_INDEX_FORMAT'
   }
 }
 
 class ValidationError extends Error {
   constructor(message = 'Validation failed for input or arguments') {
     super(message)
-    this.name = 'ValidationError'
+    this.name = this.constructor.name
+
+    this.code = 'VALIDATION_ERROR'
   }
 }
 
