@@ -9,13 +9,13 @@ const logger = require('../utils/logger')
  */
 function initCommand(targetDir=process.cwd()) {
     try {
-        const repo = Repository.init()
+        const repo = Repository.init(targetDir)
 
         console.log(`Initialized empty mygit repository in ${repo.mygitDir}`)
         logger.info(`Initialized empty mygit repository in ${repo.mygitDir}`)
 
     } catch (error) {
-        console.error(`Error: ${error.message}`)
+        console.error(error.message)
         logger.error(error.stack)
     }
 }
