@@ -5,7 +5,7 @@ const { compress, decompress } = require('../../utils/compression')
 const { sha1 } = require('../../utils/hash')
 const { objectPath } = require('../repository/paths')
 const { ObjectNotFoundError, InvalidObjectError } = require('../../errors')
-const Repository = require('../repository/repository')
+const { isValidObjectType } = require('../../utils/validation')
 
 /**
  * Serialize mygit object.
@@ -52,6 +52,9 @@ function parseObject(data) {
  * @returns {String} 
  */
 function writeObject(repo, type, content) {
+    if (!isValidObjectType(type)) {
+        throw new InvalidObjectError(`Invalid object type: ${type}`)
+    }
     const serialized = serializeObject(type, content)
 
     const hash = sha1(serialized)

@@ -40,10 +40,10 @@ function isValidObjectType(type) {
  * @returns {boolean}
  */
 function isValidRef(ref) {
-  if (typeof ref !== "string") return false;
-  if (!ref.startsWith("refs/")) return false;
-  // A ref must have a valid path after refs/
-  return /^(refs\/heads\/|refs\/tags\/)[^\s~^:?*\[]+$/.test(ref);
+    if (typeof ref !== 'string') return false;
+    if (!ref.startsWith('refs/')) return false;
+    // A ref must have a valid path after refs/
+    return /^(refs\/heads\/|refs\/tags\/|refs\/remotes\/|refs\/stash\/)[^\s~^:?*\[]+$/.test(ref);
 }
 
 /**
@@ -133,16 +133,51 @@ function isValidEmail(email) {
 }
 
 /**
- * Validates if the provided value is a valid repository object.
+ * Checks whether a string is a valid SHA-1 object hash. (case-insensitive)
+ * A valid hash must be exactly 40 hexadecimal characters (0-9, a-f, A-F).
+ * 
+ * @param {string} hash - The hash string to validate. 
+ * @returns {boolean} True if valid SHA-1 format, otherwise false.
+ */
+function isValidObjectHash(hash) {
+    return (typeof hash === "string" && /^[a-fA-F0-9]{40}$/.test(hash));
+}
+
+/**
+ * Validates whether a string has a basic email format.
+ * Note: This is a simplified validation, not fully RFC-compliant.
+ * 
+ * @param {string} email - Email address to validate. 
+ * @returns {boolean} True if email format is valid, otherwise false.
+ */
+function isValidEmail(email) {
+    return (typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+}
+
+/**
+ * Checks whether an object is a valid repository structure.
+ *
+ * Required properties:
+ * - worktree
+ * - mygitDir
+ * - paths
+ *
+ * @param {object} repo - Repository object to validate.
+ * @returns {boolean} True if repository is valid, otherwise false.
  */
 function isValidRepository(repo) {
-  return (
-    typeof repo === "object" &&
-    repo !== null &&
-    "worktree" in repo &&
-    "mygitDir" in repo &&
-    "paths" in repo
-  );
+    return (repo !== null && typeof repo === "object" && Object.prototype.hasOwnProperty.call(repo, 'worktree') && Object.prototype.hasOwnProperty.call(repo, 'mygitDir') && Object.prototype.hasOwnProperty.call(repo, 'paths'));
+}
+
+/**
+ * Validates a commit message.
+ * Must be a non-empty string after trimming whitespace.
+ *
+ * @param {string} message - Commit message.
+ * @returns {boolean} True if valid, otherwise false.
+ */
+function isValidCommitMessage(message) {
+    return (typeof message === "string" && message.trim().length !== 0);
 }
 
 /**
@@ -154,16 +189,15 @@ function isValidCommitMessage(message) {
 
 
 module.exports = {
-  isValidHash,
-  isValidObjectType,
-  isValidRef,
-  isValidTagName,
-  isValidBranchName,
-  isValidPath,
-  isValidSignature,
-  isValidObjectHash,
-  isValidEmail,
-  isValidRepository,
-  isValidCommitMessage,
-  assertRequired,
+    isValidHash,
+    isValidObjectType,
+    isValidRef,
+    isValidTagName,
+    isValidBranchName,
+    isValidPath,
+    isValidSignature,
+    isValidObjectHash,
+    isValidEmail,
+    isValidRepository,
+    isValidCommitMessage
 };

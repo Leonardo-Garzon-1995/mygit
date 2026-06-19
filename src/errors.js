@@ -50,6 +50,23 @@ class IndexFormatError extends Error {
   }
 }
 
+class InvalidHashError extends MygitError {
+  constructor (hash) {
+    super(`Inavlid hash: ${hash.slice(0, 8)}...`)
+
+    this.code = 'INVALID_HASH'
+    this.hash = hash
+  } 
+}
+
+class InvalidConfigError extends MygitError {
+  constructor(message) {
+    super(message)
+
+    this.code = 'INVALID_CONFIG'
+  }
+}
+
 class ValidationError extends Error {
   constructor(message = 'Validation failed for input or arguments') {
     super(message)
@@ -65,5 +82,7 @@ module.exports = {
   InvalidObjectError,
   InvalidReferenceError,
   IndexFormatError,
+  InvalidHashError,
+  InvalidConfigError,
   ValidationError
 }

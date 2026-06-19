@@ -1,7 +1,8 @@
 const { readObject, writeObject } = require('./storage')
 const { parseTree } = require('./parser')
-const { ValidationError, InvalidObjectError } = require('../../errors')
-const Repository = require('../repository/repository')
+const { OBJECT_TYPES } = require('../../constants')
+const { isValidHash } = require('../../utils/validation')
+const { ValidationError, InvalidObjectError, InvalidHashError } = require('../../errors')
 
 /* Tree object format:
     tree <size>\0<entries>
@@ -22,8 +23,11 @@ const Repository = require('../repository/repository')
 function validateTreeEntry(entry) {
     if (!entry)      throw new ValidationError('Tree entry is required')
     if (!entry.mode) throw new ValidationError('Tree entry mode is required')
+    if (typeof entry.mode !== 'string') throw new ValidationError('Tree entry mode must be of type string')
     if (!entry.name) throw new ValidationError('Tree entry name is required')
+    if (typeof entry.name !== 'string') throw new ValidationError('Tree entry name must be of type string')
     if (!entry.hash) throw new ValidationError('Tree entry hash is required')
+    if (!isValidHash(entry.hash)) throw new InvalidHashError(entry.hash)
 }
 
 /**
@@ -35,7 +39,11 @@ function validateTreeEntry(entry) {
 function serializeTree(entries) {
     const chunks = []
 
-    for (const entry of entries) {
+    const sorted = [...entries].sort(
+        (a, b) => a.name.localeCompare(b.name)
+    )
+
+    for (const entry of sorted) {
         validateTreeEntry(entry)
 
         const header = Buffer.from(`${entry.mode} ${entry.name}\0`)
@@ -65,7 +73,7 @@ function writeTreeObject(repo, entries) {
 
     const content = serializeTree(entries)
 
-    return writeObject(repo, 'tree', content)
+    return writeObject(repo, OBJECT_TYPES.TREE, content)
 }
 
 /**
@@ -78,7 +86,7 @@ function writeTreeObject(repo, entries) {
 function readTreeObject(repo, hash) {
     const object = readObject(repo, hash)
 
-    if (object.type !== 'tree') {
+    if (object.type !== OBJECT_TYPES.TREE) {
         throw new InvalidObjectError(`${hash} is not a tree object`)
     }
 
@@ -116,8 +124,20 @@ function findEntryHash(repo, treeHash, name) {
     return entry ? entry.hash : null
 }
 
+/**
+ * Returns an array with the names of tree entry
+ * @param {Repository} repo 
+ * @param {string} treeHash 
+ * @returns {Array<string>}
+ */
+function getEntryNames(repo, treeHash) {
+    return readTreeObject(repo, treeHash).map(entry => entry.name)
+}
+
+// To implement later 
+// findEntryByPath
 module.exports = {
-    serializeTree,
+    // serializeTree,
     writeTreeObject,
     readTreeObject,
     findEntry,

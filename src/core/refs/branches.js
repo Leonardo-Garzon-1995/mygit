@@ -21,7 +21,7 @@ function validateBranchName(name) {
 
 // Core
 
-function createBranch(repo, branchName, hash='') {
+function createBranch(repo, branchName, hash) {
     validateBranchName(branchName)
 
     createReference(branchPath(repo, branchName), hash)
@@ -33,7 +33,7 @@ function readBranch(repo, branchName) {
     return readReference(branchPath(repo, branchName))
 }
 
-function updateBranch(repo, branchName, hash='') {
+function updateBranch(repo, branchName, hash) {
     validateBranchName(branchName)
 
     updateReference(branchPath(repo, branchName), hash)
@@ -50,9 +50,10 @@ function deleteBranch(repo, branchName) {
 function branchExists(repo, branchName) {
     validateBranchName(branchName)
 
-    referenceExists(branchPath(repo, branchName))
+    return referenceExists(branchPath(repo, branchName))
 }
 
+// Add recursive traversal later. to allowd nested branch names
 function listBranches(repo) {
     const headsDir = repo.paths.heads
     if (!fs.exists(headsDir)) {

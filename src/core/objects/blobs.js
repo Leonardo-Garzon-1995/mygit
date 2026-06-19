@@ -2,8 +2,7 @@ const fs = require("../../utils/filesystem");
 const { writeObject, readObject, objectExists } = require("./storage");
 const { InvalidObjectError, ValidationError } = require("../../errors");
 
-// constants not yet implemented
-const { OBJECT_TYPES } = require("../../constants");
+const { OBJECT_TYPES } = require('../../constants')
 
 /**
  * Crate blob object from raw content
@@ -18,6 +17,8 @@ function writeBlobObject(repo, content) {
   return writeObject(repo, OBJECT_TYPES.BLOB, content);
 }
 
+// Rename hashFile to createBlobFromFile - this is gonna be userd by hash-object
+
 /**
  * Create blob from file contents
  * @param {*} repo
@@ -25,11 +26,11 @@ function writeBlobObject(repo, content) {
  * @returns
  */
 function hashFile(repo, filePath) {
-  if (!fs.existsSync(filePath)) {
-    throw new ValidationError(`File does not exists: ${filePath}`);
-  }
+    if (!fs.exists(filePath) || !fs.isFile(filePath)) {
+        throw new ValidationError(`File does not exists: ${filePath}`)
+    }
 
-  const content = fs.readFileSync(filePath);
+    const content =  fs.readFile(filePath)
 
   return writeBlobObject(repo, content);
 }
@@ -53,15 +54,15 @@ function readBlobObject(repo, hash) {
 }
 
 function readBlobAsString(repo, hash) {
-  return readBlob(repo, hash).toString("utf8");
+    return readBlobObject(repo, hash).toString('utf8')
 }
 
 // BLOB WRITING
 
 function writeBlobToFile(repo, hash, filePath) {
-  const content = readBlob(repo, hash);
+    const content = readBlobObject(repo, hash)
 
-  fs.writeFileSync(filePath, content);
+    fs.writeFile(filePath, content)
 }
 
 // UTILITIED
@@ -77,29 +78,38 @@ function blobExists(repo, hash) {
 }
 
 function getBlobSize(repo, hash) {
-  return readBlob(repo, hash).length;
+    return readBlobObject(repo, hash).length 
 }
 
 function blobMatchesFile(repo, hash, filePath) {
-  if (!fs.existsSync(filePath)) {
-    return false;
-  }
+    if (!fs.exists(filePath)) {
+        return false
+    }
 
   const blobContent = readBlob(repo, hash);
 
-  const fileContent = fs.readFileSync(filePath);
+    const fileContent = fs.readFile(filePath)
 
   return blobContent.equals(fileContent);
 }
 
-/** Returns blob metadata (hash and size) from repository. */
-function readBlobMetadata(repo, hash) {
-  const content = readBlobObject(repo, hash);
+// To implement later
 
-  return {
-    hash,
-    size: content.length,
-  };
+/* 
+- readBlobMetadata()
+- readBlobLines
+- crate a blob from file*/
+
+module.exports = {
+    writeBlobObject,
+    writeBlobToFile,
+    hashFile,
+    readBlobObject,
+    readBlobAsString,
+    validateBlobContent,
+    blobExists,
+    getBlobSize,
+    blobMatchesFile
 }
 
 /** Returns blob content as an array of lines. */
