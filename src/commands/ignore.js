@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const {getMygitignorePatterns} = require('../utils/mygitignore')
 
 const logger = require('../utils/logger')
 const { ensureRepo } = require('../core/repository')
@@ -37,13 +38,12 @@ function listPatternsInFile() {
         return
     }
 
-    const content = fs.readFileSync(mygitignorePath, 'utf-8')
-    const patterns  = content.split('\n')
+    const patterns = getMygitignorePatterns()
     
     console.log(`\nPatterns tracked by '.mygitignore' in ${process.cwd()}\n`)
     for (const p of patterns) {
         if (p === '') continue
-        console.log(`- ${p}`)
+        console.log(`- ${p.pattern}`)
     }
 
     console.log('')
@@ -85,12 +85,12 @@ function removeAllPatternsFromFile() {
 }
 
 function ignore(args=[]) {
-    ensureRepo()
+    // ensureRepo()
     ensureMygitignoreFile()
 
     try {
         if (args[0] === '--list') {
-        listPatternsInFile()
+            listPatternsInFile()
         } else if (args[0] === '--remove') {
             removePatternFromFile(args[1])
         } else if (args[0] === '--remove-all') {
