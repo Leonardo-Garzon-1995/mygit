@@ -1,29 +1,29 @@
-const fs = require('../../utils/filesystem')
-const { writeObject, readObject, objectExists } = require('./storage')
-const { InvalidObjectError, ValidationError } = require('../../errors')
+const fs = require("../../utils/filesystem");
+const { writeObject, readObject, objectExists } = require("./storage");
+const { InvalidObjectError, ValidationError } = require("../../errors");
 
 const { OBJECT_TYPES } = require('../../constants')
 
 /**
  * Crate blob object from raw content
- * 
- * @param {*} repo 
- * @param {*} content 
- * @returns 
+ *
+ * @param {*} repo
+ * @param {*} content
+ * @returns
  */
 function writeBlobObject(repo, content) {
-    validateBlobContent(content)
+  validateBlobContent(content);
 
-    return writeObject(repo, OBJECT_TYPES.BLOB, content)
+  return writeObject(repo, OBJECT_TYPES.BLOB, content);
 }
 
 // Rename hashFile to createBlobFromFile - this is gonna be userd by hash-object
 
 /**
  * Create blob from file contents
- * @param {*} repo 
- * @param {*} filePath 
- * @returns 
+ * @param {*} repo
+ * @param {*} filePath
+ * @returns
  */
 function hashFile(repo, filePath) {
     if (!fs.exists(filePath) || !fs.isFile(filePath)) {
@@ -32,25 +32,25 @@ function hashFile(repo, filePath) {
 
     const content =  fs.readFile(filePath)
 
-    return writeBlobObject(repo, content)
+  return writeBlobObject(repo, content);
 }
 
 // BLOB READING
 
 /**
  * Read blob object - raw content
- * @param {*} repo 
- * @param {*} hash 
- * @returns 
+ * @param {*} repo
+ * @param {*} hash
+ * @returns
  */
 function readBlobObject(repo, hash) {
-    const object = readObject(repo, hash) 
+  const object = readObject(repo, hash);
 
-    if (object.type !== OBJECT_TYPES.BLOB) {
-        throw new InvalidObjectError(`${hash} is not a blob object`)
-    }
+  if (object.type !== OBJECT_TYPES.BLOB) {
+    throw new InvalidObjectError(`${hash} is not a blob object`);
+  }
 
-    return object.content
+  return object.content;
 }
 
 function readBlobAsString(repo, hash) {
@@ -68,13 +68,13 @@ function writeBlobToFile(repo, hash, filePath) {
 // UTILITIED
 
 function validateBlobContent(content) {
-    if (!Buffer.isBuffer(content) && typeof content !== 'string') {
-        throw new ValidationError('Blob content must be a Buffer or string')
-    }
+  if (!Buffer.isBuffer(content) && typeof content !== "string") {
+    throw new ValidationError("Blob content must be a Buffer or string");
+  }
 }
 
 function blobExists(repo, hash) {
-    return objectExists(repo, hash)
+  return objectExists(repo, hash);
 }
 
 function getBlobSize(repo, hash) {
@@ -86,11 +86,11 @@ function blobMatchesFile(repo, hash, filePath) {
         return false
     }
 
-    const blobContent = readBlob(repo, hash)
+  const blobContent = readBlob(repo, hash);
 
     const fileContent = fs.readFile(filePath)
 
-    return blobContent.equals(fileContent)
+  return blobContent.equals(fileContent);
 }
 
 // To implement later
@@ -111,3 +111,24 @@ module.exports = {
     getBlobSize,
     blobMatchesFile
 }
+
+/** Returns blob content as an array of lines. */
+function readBlobLines(repo, hash) {
+  const content = readBlobObject(repo, hash);
+
+  return content.toString("utf8").split(/\r?\n/);
+}
+
+module.exports = {
+  writeBlobObject,
+  writeBlobToFile,
+  hashFile,
+  readBlobObject,
+  readBlobAsString,
+  readBlobMetadata,
+  readBlobLines,
+  validateBlobContent,
+  blobExists,
+  getBlobSize,
+  blobMatchesFile,
+};
