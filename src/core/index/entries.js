@@ -1,14 +1,19 @@
-const { ValidationError } = require('../../errors')
-const { isValidHash } = require('../../utils/validation')
+const { ValidationError, InvalidHashError } = require('../../errors')
+const { FILE_MODES } = require('../../constants')
+const { isValidHash, isValidPath } = require('../../utils/validation')
+
+const MODES = Object.values(FILE_MODES)
+
+console.log(MODES)
 
 function validateIndexEntry(entry) {
     if (!entry) {
         throw new ValidationError('Entry is required')
     }
     if (!isValidHash(entry.hash)) {
-        throw new ValidationError(`Invalid object hash: ${entry.hash}`)
+        throw new InvalidHashError(entry.hash)
     }
-    if (typeof entry.mode !== 'string' || entry.mode.trim() === '') {
+    if (typeof entry.mode !== 'string' || entry.mode.trim() === '' || !MODES.includes(entry.mode)) {
         throw new ValidationError('Entry mode is required')
     }
 }
@@ -20,7 +25,7 @@ function validateIndex(index) {
     if (typeof index.version !== 'number') {
         throw new ValidationError('Index version is required')
     }
-    if (!index.entries || index.entries !== 'object') {
+    if (!index.entries || typeof index.entries !== 'object') {
         throw new ValidationError('Index entries are missing')
     }
 }
@@ -40,15 +45,21 @@ function createIndexEntry(hash, mode='100644') {
 
 function hasIndexEntry(index, filePath) {
     validateIndex(index)
+    if (!isValidPath(filePath)) {
+        throw new ValidationError(`Invalid path: ${filePath}`)
+    }
     return filePath in index.entries
 }
 
 function getIndexEntry(index, filePath) {
     validateIndex(index)
+    if (!isValidPath(filePath)) {
+        throw new ValidationError(`Invalid path: ${filePath}`)
+    }
     return (index.entries[filePath] ?? null)
 }
 
-function listIndexEntries(index) {
+function getIndexEntries(index) {
     validateIndex(index)
 
     return Object.entries(index.entries)
@@ -56,11 +67,15 @@ function listIndexEntries(index) {
 
 // mutations
 
-function setIndexEntry(index, filePath,entry) {
+function setIndexEntry(index, filePath, entry) {
     validateIndex(index)
     validateIndexEntry(entry)
 
-    index.entries[filepath] = entry
+    if (!isValidPath(filePath)) {
+        throw new ValidationError(`Invalid path: ${filePath}`)
+    }
+
+    index.entries[filePath] = entry
 
     return index
 }
@@ -84,10 +99,12 @@ function clearIndexEntries(index) {
 // Utilites
 
 function indexEntryCount(index) {
+    validateIndex(index)
     return Object.keys(index.entries).length
 }
 
 function isIndexEmpty(index) {
+    validateIndex(index)
     return indexEntryCount(index) === 0
 }
 
@@ -103,7 +120,7 @@ module.exports = {
     createIndexEntry,
     hasIndexEntry,
     getIndexEntry,
-    listIndexEntries,
+    getIndexEntries,
     setIndexEntry,
     removeIndexEntry,
     clearIndexEntries,
