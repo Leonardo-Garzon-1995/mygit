@@ -1,5 +1,5 @@
 const fs = require('../../utils/filesystem')
-
+const { isValidRef } = require('../../utils/validation')
 const { refPath } = require('../repository/paths')
 const { InvalidReferenceError } = require('../../errors')
 
@@ -23,14 +23,18 @@ function getHEADref(repo) {
 
     if (!isSymbolicHEAD(repo)) return null
 
-    return head.replace(/^ref:\s*/, '')
+    const ref = head.replace(/^ref:\s*/, '')
+    if (!isValidRef(ref)) {
+        throw new InvalidReferenceError(`Invalid reference format: ${ref}`)
+    }
+    return ref
 }
 
 // Get detached heas
 function getHEADHash(repo) {
     const head = readHEAD(repo)
 
-    if (isSymbolicHEAD) return null
+    if (isSymbolicHEAD(repo)) return null
 
     return head
 }
@@ -41,6 +45,10 @@ function setHEADRef(repo, ref) {
 
 function detachHEAD(repo, hash) {
     fs.writeFile(repo.paths.head, `${hash}\n`)
+}
+
+function isDetachedHEAD(repo) {
+    return !isSymbolicHEAD(repo)
 }
 
 function resolveHEAD(repo) {
@@ -55,7 +63,7 @@ function resolveHEAD(repo) {
     const filePath = refPath(repo, ref)
 
     if (!fs.exists(filePath)) {
-        return null
+        throw new InvalidReferenceError()
     }
 
     return fs.readFile(filePath).trim()
@@ -63,6 +71,10 @@ function resolveHEAD(repo) {
 
 function getCurrentBranch(repo) {
     const headRef = getHEADref(repo)
+
+    if (!headRef) {
+        return null
+    }
 
     return headRef.replace(/^refs\/heads\//, '').trim()
 }
