@@ -1,29 +1,18 @@
 const { writeObject, readObject } = require('./storage')
 const { ValidationError, InvalidObjectError } = require('../../errors')
-
-// parseTag not implemented yet
+const { isValidHash, isValidObjectType, isValidTagName, isValidSignature } = require('../../utils/validation')
+const { formatSignature, parseSignature } = require('./signatures')
 const { parseTag } = require('./parser')
-
-// constants.js not implemented yet
 const { OBJECT_TYPES } = require('../../constants')
 
 
 // HLEPERS
 
-function formatSignature(signature) {
-    return (
-        `${signature.name} ` +
-        `<${signature.email}> ` +
-        `${signature.timestamp} ` +
-        `${signature.timezone}`
-    )
-}
-
 function validateTagData({object, type, tag, tagger}) {
-    if (!object) throw new ValidationError('Tag object is required')
-    if (!type) throw new ValidationError('Tag target type is required')
-    if (!tag) throw new ValidationError('Tag name is required')
-    if (!tagger) throw new ValidationError('Tagger information is required')
+    if (!object || !isValidHash(object)) throw new ValidationError('Tag object is required')
+    if (!type || !isValidObjectType(type)) throw new ValidationError('Tag target type is required')
+    if (!tag || !isValidTagName(tag)) throw new ValidationError('Tag name is required')
+    if (!tagger || !isValidSignature(tagger)) throw new ValidationError('Tagger information is required')
 }
 
 /**
@@ -95,7 +84,7 @@ function getTaggedObject(repo, hash) {
  * @returns 
  */
 function getTaggedType(repo, hash) {
-    const tag = readTag(repo, hash)
+    const tag = readTagObject(repo, hash)
 
     return tag.type
 }
