@@ -1,28 +1,30 @@
-const fs = require('fs')
-
-const logger = require('../../utils/logger')
+const fs = require('../../utils/filesystem')
+const { InvalidConfigError } = require('../../errors')
+const { type } = require('os')
 
 function readConfig(repo) {
-    const configPath = repo.paths.config
-
-    if (!fs.existsSync(configPath)) {
-        return {}
-    }
-
-    const raw = fs.readFileSync(configPath, 'utf8')
-
     try {
+        const configPath = repo.paths.config
+
+        if (!fs.exists(configPath)) {
+            return {}
+        }
+
+        const raw = fs.readFile(configPath, 'utf8')
+
         return JSON.parse(raw)
     } catch (error) {
-        logger.error(error.stack)
-        throw new Error(`Invalid repository config: ${error.message}`)
+        throw new InvalidConfigError(`Invalid repository config: ${error.message}`)
     }
 }
 
 function writeConfig(repo, config) {
+    if (typeof config !== 'object' || config === null) {
+        throw new InvalidConfigError('Invalid repository config')
+    }
     const configPath = repo.paths.config
 
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+    fs.writeFile(configPath, JSON.stringify(config, null, 2))
 }
 
 function getConfigValue(repo, key, defaultValue=null) {
