@@ -16,8 +16,8 @@ const { OBJECT_TYPES } = require("../constants");
  * @returns {boolean}
  */
 function isValidHash(hash) {
-  if (typeof hash !== "string") return false;
-  return /^[a-f0-9]{40}$/i.test(hash);
+    if (typeof hash !== "string") return false;
+    return /^[a-fA-F0-9]{40}$/i.test(hash);
 }
 
 /**
@@ -28,8 +28,8 @@ function isValidHash(hash) {
  * @returns {boolean}
  */
 function isValidObjectType(type) {
-  const validTypes = Object.values(OBJECT_TYPES);
-  return validTypes.includes(type);
+    const validTypes = Object.values(OBJECT_TYPES);
+    return validTypes.includes(type);
 }
 
 /**
@@ -53,17 +53,17 @@ function isValidRef(ref) {
  * @returns {boolean}
  */
 function isValidBranchName(name) {
-  if (typeof name !== "string" || name.trim() == "") return false;
-  if (name.trim() === "") return false;
-  if (name.includes(" ")) return false;
-  if (name.includes("..")) return false;
-  if (name.includes("~")) return false;
-  if (name.includes("^")) return false;
-  if (name.includes(":")) return false;
-  if (name.includes("*")) return false;
-  if (name.includes("[")) return false;
-  if (name.includes("\\")) return false;
-  return true;
+    if (typeof name !== "string" || name.trim() == "") return false;
+    if (name.trim() === "") return false;
+    if (name.includes(" ")) return false;
+    if (name.includes("..")) return false;
+    if (name.includes("~")) return false;
+    if (name.includes("^")) return false;
+    if (name.includes(":")) return false;
+    if (name.includes("*")) return false;
+    if (name.includes("[")) return false;
+    if (name.includes("\\")) return false;
+    return true;
 }
 
 /**
@@ -73,9 +73,9 @@ function isValidBranchName(name) {
  * @returns {boolean}
  */
 function isValidPath(filePath) {
-  if (typeof filePath !== "string") return false;
-  if (filePath.trim() === "") return false;
-  return true;
+    if (typeof filePath !== "string") return false;
+    if (filePath.trim() === "") return false;
+    return true;
 }
 
 /**
@@ -85,19 +85,19 @@ function isValidPath(filePath) {
  * @returns {boolean}
  */
 function isValidTagName(tagName) {
-  if (typeof tagName !== "string") {
-    return false;
-  }
-
-  const invalid = ["..", "~", "^", ":", "?", "*", "[", "\\"];
-
-  for (const token of invalid) {
-    if (tagName.includes(token)) {
-      return false;
+    if (typeof tagName !== "string") {
+        return false;
     }
-  }
 
-  return true;
+    const invalid = ["..", "~", "^", ":", "?", "*", "[", "\\"];
+
+    for (const token of invalid) {
+        if (tagName.includes(token)) {
+        return false;
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -107,30 +107,11 @@ function isValidTagName(tagName) {
  * @returns {boolean}
  */
 function isValidSignature(signature) {
-  if (typeof signature !== "string") return false;
+    if (typeof signature !== "string") return false;
 
-  return /^(.*?) <(.*?)> (\d+) ([+-]\d{4})$/.test(signature);
+    return /^(.*?) <(.*?)> (\d+) ([+-]\d{4})$/.test(signature);
 }
 
-/**
- * Validates if the provided value is a valid SHA-1 object hash.
- */
-function isValidObjectHash(hash) {
-  return (
-    typeof hash === "string" && hash.length === 40 && /^[a-f0-9]+$/i.test(hash)
-  );
-}
-
-/**
- * Validates if the provided value is a valid email.
- */
-function isValidEmail(email) {
-  return (
-    typeof email === "string" &&
-    email.trim() !== "" &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  );
-}
 
 /**
  * Checks whether a string is a valid SHA-1 object hash. (case-insensitive)
@@ -151,7 +132,11 @@ function isValidObjectHash(hash) {
  * @returns {boolean} True if email format is valid, otherwise false.
  */
 function isValidEmail(email) {
-    return (typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    return (
+        typeof email === "string" &&
+        email.trim() !== "" &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    );
 }
 
 /**
@@ -166,7 +151,12 @@ function isValidEmail(email) {
  * @returns {boolean} True if repository is valid, otherwise false.
  */
 function isValidRepository(repo) {
-    return (repo !== null && typeof repo === "object" && Object.prototype.hasOwnProperty.call(repo, 'worktree') && Object.prototype.hasOwnProperty.call(repo, 'mygitDir') && Object.prototype.hasOwnProperty.call(repo, 'paths'));
+    return (repo !== null && 
+        typeof repo === "object" && 
+        Object.prototype.hasOwnProperty.call(repo, 'worktree') && 
+        Object.prototype.hasOwnProperty.call(repo, 'mygitDir') && 
+        Object.prototype.hasOwnProperty.call(repo, 'paths')
+    );
 }
 
 /**
@@ -180,12 +170,6 @@ function isValidCommitMessage(message) {
     return (typeof message === "string" && message.trim().length !== 0);
 }
 
-/**
- * Validates if the provided value is a valid commit message.
- */
-function isValidCommitMessage(message) {
-  return typeof message === "string" && message.trim() !== "";
-}
 
 
 module.exports = {
