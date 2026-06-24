@@ -1,4 +1,4 @@
-const fs   = require('fs')
+const fs = require('../utils/filesystem')
 const path = require('../utils/paths')
 const { writeBlobObject, } = require('../core/objects/blobs')
 const getFileMode  = require('../core/objects/modes')
@@ -13,7 +13,6 @@ const {
     getIndexStoredPaths,
     clearIndexEntries,
 } = require('../core/index/index')
-const Repository = require('../core/repository/repository')
 
 /**
  * Stage a file
@@ -29,12 +28,12 @@ function stageFile(repo, filePath) {
     if (!filePath) {
         throw new ValidationError('File path is required')
     }
-
-    const hash = writeBlobObject(repo, filePath)
+    const content = fs.readFileBuffer(filePath)
+    const hash = writeBlobObject(repo, content)
 
     const mode = getFileMode(filePath)
 
-    const relativePath = path.relative(repo.workTree, filePath)
+    const relativePath = path.relative(repo.worktree, filePath)
 
     const index = readIndex(repo)
 
@@ -71,7 +70,7 @@ function stageFiles(repo, filePaths=[]) {
  * @param {string} filePath
  */
 function unstageFile(repo, filePath) {
-    const relativePath = path.relative(repo.workTree, filePath)
+    const relativePath = path.relative(repo.worktree, filePath)
 
     const index = readIndex(repo)
 
@@ -89,7 +88,7 @@ function unstageFile(repo, filePath) {
  * @returns {boolean}
  */
 function isStaged(repo, filePath) {
-    const relativePath = path.relative(repo.workTree, filePath)
+    const relativePath = path.relative(repo.worktree, filePath)
 
     const index = readIndex(repo)
 
@@ -108,6 +107,7 @@ function listStagedFiles(repo) {
     return getIndexStoredPaths(index)
 }
 
+// Move _walkDir to filesystem later
 /**
  * Recursively collect all file paths under `dirPath`, skipping the `.mygit`
  * metadata directory.
@@ -120,7 +120,7 @@ function _walkDir(dirPath) {
 
     let entries
     try {
-        entries = fs.readdirSync(dirPath)
+        entries = fs.listDir(dirPath)
     } catch {
         return result
     }
@@ -128,11 +128,11 @@ function _walkDir(dirPath) {
     for (const entry of entries) {
         if (entry === '.mygit') continue
 
-        const fullPath = require('path').join(dirPath, entry)
+        const fullPath = path.join(dirPath, entry)
 
         let stats
         try {
-            stats = fs.lstatSync(fullPath)
+            stats = fs.lstat(fullPath)
         } catch {
             continue
         }
@@ -173,7 +173,7 @@ function stageDirectory(repo, directoryPath) {
         throw new ValidationError(`Path does not exist: ${directoryPath}`)
     }
 
-    const stats = fs.lstatSync(directoryPath)
+    const stats = fs.lstat(directoryPath)
     if (!stats.isDirectory()) {
         throw new ValidationError(`Path is not a directory: ${directoryPath}`)
     }
@@ -189,6 +189,7 @@ function stageDirectory(repo, directoryPath) {
     return staged
 }
 
+// This could become useful later, move to utils/
 /**
  * Convert a simple wildcard pattern (e.g. `*.js`, `*.txt`) to a RegExp.
  *
@@ -228,12 +229,12 @@ function stagePattern(repo, pattern) {
         throw new ValidationError('Pattern is required')
     }
 
-    const regex     = _patternToRegex(require('path').basename(pattern))
-    const allFiles  = _walkDir(repo.workTree)
+    const regex     = _patternToRegex(path.basename(pattern))
+    const allFiles  = _walkDir(repo.worktree)
     const staged    = []
 
     for (const filePath of allFiles) {
-        const base = require('path').basename(filePath)
+        const base = path.basename(filePath)
         if (regex.test(base)) {
             stageFile(repo, filePath)
             staged.push(filePath)
@@ -254,7 +255,7 @@ function stagePattern(repo, pattern) {
  * @returns {string[]} Absolute paths of all staged files.
  */
 function stageAll(repo) {
-    return stageDirectory(repo, repo.workTree)
+    return stageDirectory(repo, repo.worktree)
 }
 
 /**
