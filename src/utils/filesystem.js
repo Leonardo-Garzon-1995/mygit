@@ -230,6 +230,10 @@ function stat(filePath) {
     return fs.statSync(filePath)
 }
 
+function lstat(filePath) {
+    return fs.lstatSync(filePath)
+}
+
 /**
  * Return the size (in bytes) of the file at `filePath`.
  *
@@ -269,6 +273,7 @@ module.exports = {
     copyFile,
     moveFile,
     stat,
+    lstat,
     fileSize,
     modifiedTime
 }
