@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const util = require('util')
 
 const LOG_DIR = path.join(__dirname, '..', '..', 'logs')
 const LOG_FILE = path.join(LOG_DIR, "mygit.log")
@@ -14,6 +15,19 @@ function ensureLogFile() {
     }
 }
 
+function formatLogMessage(message) {
+    if (typeof message === 'object') {
+        return JSON.stringify(message)
+    } else if (message instanceof Error) {
+        return util.inspect(message, {
+            despth: null,
+            showHidden: true
+        })
+    } else {
+        return message
+    }
+}
+
 function getTimeStamp() {
     return new Date().toISOString()
 }
@@ -21,7 +35,7 @@ function getTimeStamp() {
 function write(mode, message) {
     ensureLogFile()
     
-    const line = `[${getTimeStamp()}] [${mode}] ${message}\n`
+    const line = `[${getTimeStamp()}] [${mode}] ${formatLogMessage(message)}\n`
 
     fs.appendFileSync(LOG_FILE, line)
 }
