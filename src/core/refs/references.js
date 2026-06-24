@@ -4,7 +4,7 @@ const { ValidationError, InvalidReferenceError } = require('../../errors')
 const { isValidHash, isValidRef, isValidBranchName } = require('../../utils/validation')
 
 function validateReferenceName(name) {
-    if (!isValidBranchName(name)) {
+    if (typeof name !== 'string' || name.trim() === '') {
         throw new ValidationError(`Invalid reference: ${name}`)
     }
 }
@@ -12,14 +12,14 @@ function validateReferenceName(name) {
 
 // Core operations 
 
-function createReference(filePath, hash='') {
+function createReference(filePath, hash) {
     if (hash !== '' && !isValidHash(hash)) {
         throw new ValidationError(`Invalid hash: ${hash}`)
     }
 
     fs.ensureDir(path.dirname(filePath))
 
-    fs.writeFile(filePath, hash ? `${hash}\n` : '')
+    fs.writeFile(filePath, `${hash}\n`)
 }
 
 function readReference(filePath) {
@@ -56,7 +56,7 @@ function referenceExists(filePath) {
 }
 
 /**
- * Build full reference name
+ * Build full reference path
  * 
  * Example: refs/heads/main or refs/tags/v1.0.0
  * 
