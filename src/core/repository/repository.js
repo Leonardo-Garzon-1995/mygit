@@ -3,8 +3,6 @@ const path = require('../../utils/paths')
 const { MYGITDIR_NAME } = require('../../constants')
 const { RepositoryNotFoundError } = require('../../errors')
 
-const logger = require('../../utils/logger')
-
 class Repository {
     constructor(worktree, mygitDir) {
         this.worktree = worktree
@@ -22,9 +20,14 @@ class Repository {
     }
 
     static open(repoPath=process.cwd()) {
-        this.ensure()
-        const mygitDir = path.join(repoPath, MYGITDIR_NAME)
-        return new Repository(repoPath, mygitDir)
+        const repo = new Repository(
+            repoPath,
+            path.join(repoPath, MYGITDIR_NAME)
+        )
+
+        repo.ensure()
+
+        return repo
     }
 
     static find(startPath=process.cwd()) {
@@ -40,7 +43,6 @@ class Repository {
             const parent = path.dirname(current)
 
             if (parent === current) {
-                logger.error(`fatal: not a mygit repository`)
                 throw new RepositoryNotFoundError()
             }
 
@@ -72,7 +74,6 @@ class Repository {
 
     ensure() {
         if (!this.exists()) {
-            logger.warn('fatal: not a mygit repository')
             throw new RepositoryNotFoundError()
         }
     }
@@ -83,14 +84,6 @@ class Repository {
 
     resolveWorktreePath(...segments) {
         return path.join(this.worktree, ...segments)
-    }
-
-    hasHead() {
-        return fs.exists(this.paths.head)
-    }
-
-    readHead() {
-        return fs.readFile(this.paths.head).trim()
     }
 }
 
