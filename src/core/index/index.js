@@ -6,7 +6,7 @@ const {
     validateIndexEntry,
     hasIndexEntry,
     getIndexEntry,
-    listIndexEntries,
+    getIndexEntries,
     setIndexEntry,
     removeIndexEntry,
     clearIndexEntries,
@@ -31,7 +31,7 @@ module.exports = {
     
     hasIndexEntry,
     getIndexEntry,
-    listIndexEntries,
+    getIndexEntries,
 
     setIndexEntry,
     removeIndexEntry,
