@@ -4,8 +4,6 @@ const { isValidHash, isValidPath } = require('../../utils/validation')
 
 const MODES = Object.values(FILE_MODES)
 
-console.log(MODES)
-
 function validateIndexEntry(entry) {
     if (!entry) {
         throw new ValidationError('Entry is required')
@@ -30,7 +28,7 @@ function validateIndex(index) {
     }
 }
 
-function createIndexEntry(hash, mode='100644') {
+function createIndexEntry(hash, mode=FILE_MODES.NORMAL) {
     const entry = {
         hash,
         mode
