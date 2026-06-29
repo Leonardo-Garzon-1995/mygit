@@ -1,6 +1,6 @@
 const fs = require('../../utils/filesystem')
 const { validateIndex } = require('./entries')
-const { IndexFormatError } = require('../../errors')
+const { ValidationError} = require('../../errors')
 
 function serializeIndex(index) {
     validateIndex(index)
@@ -9,16 +9,13 @@ function serializeIndex(index) {
 }
 
 function writeIndex(repo, index) {
-    validateIndex(index)
-
-    try {
-        const content = serializeIndex(index)
-
-        fs.writeFile(repo.paths.index, content)
-
-    } catch (error) {
-        throw new IndexFormatError(`Failed to write index: ${error.message}`)
+    if (!repo || !repo.paths?.index) {
+        throw new ValidationError('Repository is required')
     }
+
+    const content = serializeIndex(index)
+
+    fs.writeFile(repo.paths.index, content)
 }
 
 module.exports = {
