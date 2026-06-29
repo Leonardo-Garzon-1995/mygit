@@ -1,26 +1,31 @@
-const fs = require('fs')
-const path = require('path')
-
 const { readIndex } = require('../core/index')
-const { ensureRepo } = require('../core/repository')
+const logger = require('../utils/logger')
+
+const Repository = require('../core/repository/repository')
 
 /**
  * Prints the staged file paths recorded in the index, sorted alphabetically.
+ * 
  * Returns silently when the index is empty or has no entries.
- * @throws {Error} If the current directory is not a mygit repository
  */
 function lsFiles() {
-    ensureRepo()
+    try {
+        const repo = Repository.find()
+        repo.ensure()
 
-    const index = readIndex()
-    if (!index.entries || Object.keys(index.entries).length === 0) {
-        return
-    }
+        const index = readIndex(repo)
+        if (!index.entries || Object.keys(index.entries).length === 0) {
+            return
+        }
 
-    const sorted = Object.keys(index.entries).sort()
+        const sorted = Object.keys(index.entries).sort()
 
-    for (const filePath of sorted) {
-        console.log(filePath)
+        for (const filePath of sorted) {
+            console.log(filePath)
+        }
+    } catch (error) {
+        console.error(error.message)
+        logger.error(error.stack)
     }
 }
 
