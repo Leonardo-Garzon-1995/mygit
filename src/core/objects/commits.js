@@ -1,12 +1,16 @@
 const { readObject, writeObject } = require('./storage')
 const { parseCommit } = require('./parser')
-const { ValidationError, InvalidObjectError } = require('../../errors')
+const { OBJECT_TYPES } = require('../../constants')
+const { isValidHash } = require('../../utils/validation')
+const { ValidationError, InvalidObjectError, InvalidHashError } = require('../../errors')
 const { formatSignature, parseSignature } = require('./signatures')
 
 // Helpers
 
+// Refactor to make validation stronger
 function validateCommitData({tree, author, committer}) {
     if (!tree)      throw new ValidationError('Commit tree is required')
+    if (!isValidHash(tree)) throw new InvalidHashError(tree)
     if (!author)    throw new ValidationError('Commit author is required')
     if (!committer) throw new ValidationError('Commit committer is required')
 }
@@ -20,7 +24,7 @@ function serializeCommit({
     committer,
     message = ''
 }) {
-    validateCommitData({tree, author, commiter})
+    validateCommitData({tree, author, committer})
 
     const lines = [] 
 
@@ -49,17 +53,22 @@ function writeCommitObject(repo, {
 }) {
     const content = serializeCommit({tree, parents, author, committer, message})
 
-    return writeObject(repo, 'commit', content)
+    return writeObject(repo, OBJECT_TYPES.COMMIT, content)
 }
 
 function readCommitObject(repo, hash) {
     const object = readObject(repo, hash)
 
-    if (object.type !== 'commit') {
+    if (object.type !== OBJECT_TYPES.COMMIT) {
         throw new InvalidObjectError(`${hash} is not a commit object`)
     }
 
-    return parseCommit(object.content)
+    const commit = parseCommit(object.content)
+
+    commit.author = parseSignature(commit.author)
+    commit.committer = parseSignature(commit.committer)
+
+    return commit
 }
 
 // QUERIES
@@ -70,10 +79,16 @@ function getCommitTree(repo, hash) {
     return commit.tree
 }
 
-function getcommitParents(repo, hash) {
+function getCommitParents(repo, hash) {
     const commit = readCommitObject(repo, hash)
 
     return commit.parents
+}
+
+function getFirstParent(repo, hash) {
+    const parents = getCommitParents(repo, hash)
+
+    return parents[0] || null
 }
 
 function getCommitMessage(repo, hash) {
@@ -100,7 +115,8 @@ module.exports = {
     writeCommitObject,
     readCommitObject,
     getCommitTree,
-    getcommitParents,
+    getCommitParents,
+    getFirstParent,
     getCommitMessage,
     getCommitAuthor,
     getCommitCommitter,
