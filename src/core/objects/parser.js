@@ -158,6 +158,10 @@ function parseTag(content) {
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
+
+
+// REMOVE LATER 
+
 /**
  * Reads a git object (hash) from disk and returns its header, content type and size.
  * @param {string} hash - The hash of the object to read.
@@ -206,7 +210,8 @@ function parseObjectContent(type, content) {
             return parseTree(content)
         case 'blob':
             return content
-
+        case 'tag':
+            return parseTag(content)
         default:
             throw new InvalidObjectError(`Unknown object type: ${type}`)
     }
@@ -239,6 +244,8 @@ function parseSignature(signature) {
 
 /*
 parseCommitMessage()
+parseCommitAuthor()
+parseCommitHeader
  */
 
 

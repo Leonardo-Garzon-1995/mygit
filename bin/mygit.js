@@ -151,7 +151,7 @@ const commands = {
     },
     'test': {
         modulePath: path.join(__dirname, '..', 'test'),
-        handler: function(args) { require(this.modulePath) (args[0]) }
+        handler: function(args) { require(this.modulePath) () }
     }
 }
 
