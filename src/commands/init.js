@@ -1,4 +1,5 @@
 const Repository = require('../core/repository/repository')
+const Output = require('../cli/output')
 const logger = require('../utils/logger')
 
 /**
@@ -11,7 +12,7 @@ function initCommand(targetDir=process.cwd()) {
     try {
         const repo = Repository.init(targetDir)
 
-        console.log(`Initialized empty mygit repository in ${repo.mygitDir}`)
+        Output.success(`Initialized empty mygit repository in ${repo.mygitDir}`)
         logger.info(`Initialized empty mygit repository in ${repo.mygitDir}`)
 
     } catch (error) {
