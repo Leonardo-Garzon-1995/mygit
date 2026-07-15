@@ -77,7 +77,7 @@ function writeDirectoryTree(repo, node) {
     for (const name of names) {
         const value = node[name]
 
-        const isDirectory = typeof value === 'object' && !('hash' in values)
+        const isDirectory = value && typeof value === 'object' && !('hash' in value)
 
         if (isDirectory) {
             const subtreeHash = writeDirectoryTree(repo, value) 
@@ -97,7 +97,7 @@ function writeDirectoryTree(repo, node) {
         })
     }
 
-    return writeDirectoryTree(repo, entries)
+    return writeTreeObject(repo, entries)
 } 
 
 /**
@@ -118,7 +118,7 @@ function writeTree(repo) {
 
     const directoryTree = buildDirectoryTree(index)
 
-    return writeDirectoryTree(index, directoryTree)
+    return writeDirectoryTree(repo, directoryTree)
 }
 
 function writeTreeFromIndex(repo, index) {
@@ -130,5 +130,6 @@ function writeTreeFromIndex(repo, index) {
 module.exports = {
     buildDirectoryTree,
     writeDirectoryTree,
-    writeTree
+    writeTree,
+    writeTreeFromIndex
 }
