@@ -20,7 +20,7 @@ function formatLogMessage(message) {
         return JSON.stringify(message)
     } else if (message instanceof Error) {
         return util.inspect(message, {
-            despth: null,
+            depth: null,
             showHidden: true
         })
     } else {
