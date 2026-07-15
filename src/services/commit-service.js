@@ -1,100 +1,117 @@
-// Performs a commit operation
-/* 
-Tha is:
-Read index, build tree, read current HEAD,
-create commit object, update branch reference, return commit hash
-*/
+const { readIndex, isIndexEmpty } = require('../core/index')
+const { writeTree } = require('./write-tree-service')
 
-const { readIndex, isIndexEmpty } = require('../core/index/index')
-const { writeTreeObject } = require('../core/objects/trees')
 const { writeCommitObject } = require('../core/objects/commits')
-const { getCurrentBranch } = require('../core/refs/head')
-const { readBranch, updateBranch } = require('../core/refs/branches')
+
+const {
+    getCurrentBranch,
+    resolveHEAD,
+    isSymbolicHEAD
+} = require('../core/refs/head')
+
+const {
+    updateBranch
+} = require('../core/refs/branches')
+
 const { createSignature } = require('../core/objects/signatures')
-const { ValidationError } =  require('../errors')
-const { resolve } = require('../utils/paths')
+
+const { ValidationError } = require('../errors')
 
 /**
- * Convert index entries into tree entries
- * @param {Object} index 
- * @returns {Array<Object>}
+ * Resolve commit parent(s).
+ *
+ * Returns:
+ * []
+ *     Initial commit
+ *
+ * [<hash>]
+ *     Normal commit
+ *
+ * @param {Repository} repo
+ * @returns {string[]}
  */
-function buildTreeEntries(index) {
-    const entries = []
-
-    for (const [filePath, entry] of Object.entries(index.entries)) {
-        entries.push({
-            mode: entry.mode,
-            name: filePath,
-            hash: entry.hash
-        })
-    }
-
-    return entries
-}   
-
 function resolveParents(repo) {
-    try {
-        const branchName = getCurrentBranch(repo)
-        const parentHash = readBranch(repo, branchName)
-        if (!parentHash) {
-            return []
-        }
+    const parent = resolveHEAD(repo)
 
-        return [parentHash]
-    } catch (error) {
-        return []
-    }
+    return parent ? [parent] : []
 }
 
-function commit(repo, {message, authorName, authorEmail}) {
+/**
+ * Create a commit from the current index.
+ *
+ * Flow:
+ * 1. Validate commit.
+ * 2. Build tree.
+ * 3. Resolve parents.
+ * 4. Create commit object.
+ * 5. Update current reference.
+ *
+ * @param {Repository} repo
+ * @param {Object} options
+ * @returns {string}
+ */
+function commit(
+    repo,
+    {
+        message,
+        authorName,
+        authorEmail
+    }
+) {
     if (!message || message.trim() === '') {
-        throw new ValidationError('Commit message is required')
+        throw new ValidationError(
+            'Commit message is required'
+        )
     }
 
-    const index = readIndex(repo) 
+    const index = readIndex(repo)
+
     if (isIndexEmpty(index)) {
-        throw new ValidationError('Nothing to commit')
+        throw new ValidationError(
+            'Nothing to commit'
+        )
     }
 
-    const treeEntries = buildTreeEntries(index)
+    const tree = writeTree(repo)
 
-    const treeHash = writeTreeObject(repo, treeEntries)
-
-    const parents = resolveParents(repo)
-
-    const signature = createSignature(authorName, authorEmail)
+    const signature =
+        createSignature(authorName, authorEmail)
 
     const commitHash = writeCommitObject(repo, {
-        tree: treeHash,
-        parents,
+        tree,
+        parents: resolveParents(repo),
         author: signature,
         committer: signature,
         message
     })
 
-    const branchName = getCurrentBranch(repo)
-
-    updateBranch(repo, branchName, commitHash)
+    if (isSymbolicHEAD(repo)) {
+        updateBranch(
+            repo,
+            getCurrentBranch(repo),
+            commitHash
+        )
+    } else {
+        // Detached HEAD support
+        // TODO:
+        // updateHEAD(repo, commitHash)
+    }
 
     return commitHash
 }
 
+/**
+ * Return current HEAD commit hash.
+ *
+ * @param {Repository} repo
+ * @returns {string|null}
+ */
 function getHeadCommit(repo) {
-    try {
-        const branchName = getCurrentBranch(repo) 
-        const hash = readBranch(repo, branchName) 
-
-        return hash || null
-    } catch (error) {
-        return null
-    }
+    return resolveHEAD(repo)
 }
 
 module.exports = {
     commit,
     getHeadCommit,
-
-    buildTreeEntries,
     resolveParents
 }
