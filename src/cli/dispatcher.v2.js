@@ -1,6 +1,6 @@
 const path = require('path')
-
 const { ValidationError } = require('../errors')
+const displayHelp = require('../utils/displayHelp')
 
 const {
     requireArgument,
@@ -144,7 +144,11 @@ const commandAdapters = {
  */
 async function dispatch(parsed) {
     if (!parsed.command) {
-        throw new ValidationError('No command provided')
+        displayHelp()
+    }
+
+    if (parsed.command === 'help') {
+        displayHelp(parsed.args[0])
     }
 
     const adapter = commandAdapters[parsed.command]
