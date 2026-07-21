@@ -1,4 +1,5 @@
-const { readIndex } = require('../core/index')
+const { readIndex } = require('../core/index/index')
+const Output = require('../cli/output')
 const logger = require('../utils/logger')
 
 const Repository = require('../core/repository/repository')
@@ -8,7 +9,7 @@ const Repository = require('../core/repository/repository')
  * 
  * Returns silently when the index is empty or has no entries.
  */
-function lsFiles() {
+module.exports = function lsFiles() {
     try {
         const repo = Repository.find()
         repo.ensure()
@@ -21,12 +22,10 @@ function lsFiles() {
         const sorted = Object.keys(index.entries).sort()
 
         for (const filePath of sorted) {
-            console.log(filePath)
+            Output.info(filePath)
         }
     } catch (error) {
-        console.error(error.message)
-        logger.error(error.stack)
+        throw new Error(error)
     }
 }
 
-module.exports = lsFiles
