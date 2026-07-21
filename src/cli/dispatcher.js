@@ -41,7 +41,7 @@ async function dispatch(parsed) {
     }
 
     // Execute command
-    return handler(parsed.args, parsed.options, parsed)
+    return handler(parsed.args, parsed.options)
 }
 
 // UTILITIES 
@@ -66,7 +66,7 @@ function getCommands() {
 
 // USeful later for plugins and extensions 
 /**
- * Registe commands dynamically
+ * Register commands dynamically
  * @param {String} name 
  * @param {Function} handler 
  */
