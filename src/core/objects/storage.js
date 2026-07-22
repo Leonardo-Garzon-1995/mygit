@@ -103,10 +103,23 @@ function objectExists(repo, hash) {
     return fs.exists(objectPath(repo, hash))
 }
 
+/**
+ * Compute the hash of an object without writing it.
+ *
+ * @param {string} type
+ * @param {Buffer|string} content
+ * @returns {string}
+ */
+function computeObjectHash(type, content) {
+    const serialized = serializeObject(type, content)
+    return sha1(serialized)
+}
+
 module.exports = {
     serializeObject,
     parseObject,
     writeObject,
     readObject,
-    objectExists
+    objectExists,
+    computeObjectHash
 }
