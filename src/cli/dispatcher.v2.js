@@ -67,17 +67,7 @@ const commandAdapters = {
     },
 
     'hash-object'(handler, parsed) {
-
-        const type = parsed.options.t || 'blob'
-        const write = !!parsed.options.w
-
-        const file = requireArgument(
-            parsed,
-            0,
-            'Path required'
-        )
-
-        return handler(type, file, write)
+        return handler(parsed.args, parsed.options)
     },
 
     writeTree(handler) {

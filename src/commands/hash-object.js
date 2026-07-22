@@ -1,71 +1,61 @@
-const fs = require('fs')
-const path = require('path')
-const crypto = require('crypto') 
-const zlib = require('zlib') 
-
-
-/*
-Blob object structure
-    'blob <size>\0<content>'
-*/ 
-
 /**
- * Hashes a file as a blob object using the same header and compression format as mygit objects.
- * Optionally writes the compressed blob into the object database.
- * @param {string} filePath - Path of the file to hash
- * @param {boolean} [write=true] - Whether to write the blob object to .mygit/objects
- * @returns {string} SHA-1 hash of the blob object
- * @throws {Error} If the file path is missing or the file does not exist
- */
-function hashObject(type='blob', filePath, write=false) {
+ * @file hash-object.js
+ * @description Implements the `hash-object` command for hashing and storing objects in the repository.
+ * 
+ * Object types supported: 'blob', 'tree', 'commit'.
+ *  Blob structure: `blob <size>\0<content>`
+ *  Tree structure: `tree <size>\0<entries>`
+ *  Commit structure: `commit <size>\0<content>`
+ *  
+ * */
 
-    if (!filePath) {
-        console.error('Error: No file path provided');
-        console.error(' Usage: mygit hash-object <file-path> -t <type>');
-        process.exit(1);
-    }
+const { InvalidObjectError } = require('../errors')
+const { OBJECT_TYPES} = require('../constants')
+const Output = require('../cli/output')
+const Repository = require('../core/repository/repository')
+const { writeBlobObject } = require('../core/objects/blobs')
+const { computeObjectHash } = require('../core/objects/storage')
+const path = require('../utils/paths')
+const fs = require('../utils/filesystem')
 
-    const absolutePath = path.resolve(filePath)
-    if (!fs.existsSync(absolutePath)) {
-        console.error(` Error: File ${filePath} does not exist`)
-        process.exit(1)
-    }
+module.exports = function hashObject(args=[], options={}) {
 
     try {
-        const content = fs.readFileSync(absolutePath)
+        const type = options.t || OBJECT_TYPES.BLOB
+        const write = options.w || false
 
-        const header = `${type} ${content.length}\0` 
-        const storeBuffer = Buffer.concat([Buffer.from(header), content])
+        if (!Object.values(OBJECT_TYPES).includes(type)) {
+            throw new InvalidObjectError(`Invalid Object type: ${type}`)
+        }
 
-        const hash = crypto
-            .createHash('sha1')
-            .update(storeBuffer)
-            .digest('hex')
+        const filePath = args[0]
+
+        const absolutePath = path.resolve(filePath)
+        if (!fs.exists(absolutePath)) {
+            throw new InvalidObjectError(`File ${filePath} does not exist`)
+        }
+        
+        const content = fs.readFileBuffer(absolutePath)
 
         if (write) {
-            const dir = hash.slice(0, 2)
-            const fileName = hash.slice(2)
-
-            // build the full path: .git/objects/8a/b686eafe...
-            const objectsDir = path.join(process.cwd(), '.mygit', 'objects')
-            const objDir = path.join(objectsDir, dir)
-            const objPath = path.join(objDir, fileName)
-
-            // create te subfolder if it does not exist yet
-            fs.mkdirSync(objDir, {recursive: true})
-
-            // Compress the whole storeBuffer
-            const compressed = zlib.deflateSync(storeBuffer)
-
-            // Write the compressed blob object to the file
-            if (!fs.existsSync(objPath)) {
-                fs.writeFileSync(objPath, compressed)
+            const repo = Repository.find()
+            
+            if (type === OBJECT_TYPES.BLOB) {
+                const blobObj = writeBlobObject(repo, content)
+                Output.success(blobObj)
+            } else if (type === OBJECT_TYPES.TREE) {
+                // not implemented yet
+                return
+            } else if (type === OBJECT_TYPES.COMMIT) {
+                //not implemented yet
+                return
             }
+        } else {
+            const hash = computeObjectHash(type, content)
+            Output.success(hash)
         }
-        return hash
+
     } catch (error) {
-        throw Error(`Error: ${error.message}`)
+        Output.error(error.message)
     }
 }
-
-module.exports = hashObject
