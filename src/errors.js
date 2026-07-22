@@ -50,6 +50,14 @@ class IndexFormatError extends Error {
   }
 }
 
+class IndexNotFoundError extends MygitError {
+  constructor(message = 'Index is empty or does not exist') {
+    super(message)
+
+    this.code = 'INDEX_NOT_FOUND'
+  }
+}
+
 class InvalidHashError extends MygitError {
   constructor (hash) {
     super(`Inavlid hash: ${hash.slice(0, 8)}...`)
@@ -82,6 +90,7 @@ module.exports = {
   InvalidObjectError,
   InvalidReferenceError,
   IndexFormatError,
+  IndexNotFoundError,
   InvalidHashError,
   InvalidConfigError,
   ValidationError
