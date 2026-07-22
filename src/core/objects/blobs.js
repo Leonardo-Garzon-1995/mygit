@@ -100,17 +100,6 @@ function blobMatchesFile(repo, hash, filePath) {
 - readBlobLines
 - crate a blob from file*/
 
-module.exports = {
-    writeBlobObject,
-    writeBlobToFile,
-    hashFile,
-    readBlobObject,
-    readBlobAsString,
-    validateBlobContent,
-    blobExists,
-    getBlobSize,
-    blobMatchesFile
-}
 
 /** Returns blob content as an array of lines. */
 function readBlobLines(repo, hash) {
@@ -125,7 +114,6 @@ module.exports = {
   hashFile,
   readBlobObject,
   readBlobAsString,
-  readBlobMetadata,
   readBlobLines,
   validateBlobContent,
   blobExists,
