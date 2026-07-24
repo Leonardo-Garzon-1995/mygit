@@ -4,8 +4,14 @@ const path = require('../../utils/paths')
 const { compress, decompress } = require('../../utils/compression')
 const { sha1 } = require('../../utils/hash')
 const { objectPath } = require('../repository/paths')
-const { ObjectNotFoundError, InvalidObjectError } = require('../../errors')
+const { 
+    ObjectNotFoundError, 
+    InvalidObjectError, 
+    AmbiguousObjectError,
+    ValidationError
+} = require('../../errors')
 const { isValidObjectType } = require('../../utils/validation')
+const { OBJECT_TYPES } = require('../../constants')
 
 /**
  * Serialize mygit object.
@@ -41,7 +47,7 @@ function parseObject(data) {
         throw new InvalidObjectError(`Object size mismatch`)
     }
 
-    return { type, size: Number(size), content}
+    return { header, type, size: Number(size), content}
 }
 
 /**
@@ -115,11 +121,56 @@ function computeObjectHash(type, content) {
     return sha1(serialized)
 }
 
+// To implement (maybe) - findObjectByPrefix(prexix) to find a full hash from its short version
+
+/**
+ * Given a hash (at least for digits long) it resolves and returns the full hash of a git oobject
+ * 
+ * @param {Repository} repo 
+ * @param {string} objectName 
+ * @returns {string}
+ */
+function resolveObjectHash(repo, objectName) {
+    if (!objectName || typeof objectName !== 'string' || objectName.length < 4) {
+        throw new ValidationError('A hash is required and must be of type string.')
+    }
+    const dir = objectName.slice(0, 2)
+    const objDir = path.join(repo.paths.objects, dir)
+
+    if (!fs.exists(objDir)) {
+        return null
+    }
+
+    const files = fs.listDir(objDir)
+    const suffix = objectName.slice(2)
+
+    // Find files that start with the remaining prefix
+
+    const matches = files.filter( file => file.startsWith(suffix))
+
+    if (matches.length === 0) {
+        throw new ObjectNotFoundError(objectName)
+    }
+
+    if (matches.length > 1) {
+        const candidates = []
+        for (const match of matches) {
+            const fullHash = dir + match;
+            const { type } = readObject(repo, fullHash);
+            candidates.push(`${fullHash} ${type}`);
+        }
+        throw new AmbiguousObjectError(objectName, candidates)
+    }
+    // Return the full hash
+    return dir + matches[0]
+}
+
 module.exports = {
     serializeObject,
     parseObject,
     writeObject,
     readObject,
     objectExists,
-    computeObjectHash
+    computeObjectHash,
+    resolveObjectHash
 }
