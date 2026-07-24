@@ -101,11 +101,7 @@ const commandAdapters = {
     },
 
     'cat-file'(handler, parsed) {
-
-        const mode = requireArgument(parsed, 0)
-        const hash = requireArgument(parsed, 1)
-
-        return handler(mode, hash)
+        return handler(parsed.args, parsed.options)
     },
 
     'ls-files'(handler) {
