@@ -15,8 +15,7 @@ function repoExists() {
  */
 function ensureRepo() {
     if (!repoExists()) {
-        console.error('fatal: not a mygit repository')
-        process.exit(1)
+        throw new Error('fatal: not a mygit repository')
     }
 }
 
