@@ -9,7 +9,7 @@
  *  
  * */
 
-const { InvalidObjectError } = require('../errors')
+const { InvalidObjectError, ValidationError } = require('../errors')
 const { OBJECT_TYPES} = require('../constants')
 const Output = require('../cli/output')
 const Repository = require('../core/repository/repository')
@@ -29,6 +29,10 @@ module.exports = function hashObject(args=[], options={}) {
         }
 
         const filePath = args[0]
+
+        if (!filePath) {
+            throw new ValidationError(`A file path must be provided`)
+        }
 
         const absolutePath = path.resolve(filePath)
         if (!fs.exists(absolutePath)) {
