@@ -2,6 +2,14 @@ const path = require('../../utils/paths')
 const { isValidHash, isValidRef } = require('../../utils/validation')
 const { InvalidHashError, InvalidReferenceError } = require('../../errors')
 
+
+/**
+ * Returns the path of a given git object by its hash
+ * 
+ * @param {Repository} repo 
+ * @param {string} hash 
+ * @returns {string} 
+ */
 function objectPath(repo, hash) {
     if (!isValidHash(hash)) {
         throw new InvalidHashError(hash)

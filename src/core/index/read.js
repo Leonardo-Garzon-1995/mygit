@@ -15,7 +15,7 @@ function createEmptyIndex() {
 }
 
 /**
- * Read repository index
+ * Reads repository index and object index with all the files in it.
  * 
  * Returns an empty index if the file does not exist
  * 
