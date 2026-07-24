@@ -84,6 +84,16 @@ class ValidationError extends Error {
   }
 }
 
+class AmbiguousObjectError extends MygitError {
+    constructor(prefix, matches) {
+        super(`Object prefix '${prefix}' is ambiguous`)
+        this.prefix = prefix
+        this.matches = matches
+
+        this.code = 'AMBIGUOUS_OBJECT_ERROR'
+    }
+}
+
 module.exports = {
   RepositoryNotFoundError,
   ObjectNotFoundError,
@@ -93,5 +103,6 @@ module.exports = {
   IndexNotFoundError,
   InvalidHashError,
   InvalidConfigError,
-  ValidationError
+  ValidationError,
+  AmbiguousObjectError
 }
