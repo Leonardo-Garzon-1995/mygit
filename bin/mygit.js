@@ -14,7 +14,7 @@ async function main() {
     } catch (error) {
         logger.error(error.stack)
         Output.error(error.message)
-        process.exit(1)
+        process.exit(error.exitCode ?? 1)
     }
 }
 
