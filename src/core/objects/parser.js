@@ -1,4 +1,4 @@
-const { InvalidObjectError } = require('../../errors')
+const { CorruptObjectError, InvalidObjectError } = require('../../errors')
 
 /**
  * Parses a commit object into a human-readable javascript object
@@ -7,7 +7,7 @@ const { InvalidObjectError } = require('../../errors')
  */
 function parseCommit(content) {
     if (!content || !Buffer.isBuffer(content)) {
-        throw new InvalidObjectError(`Commit content must be a Buffer`)
+        throw new CorruptObjectError(`Commit content must be a Buffer`)
     }
 
     const lines = content.toString().split('\n') // Array of lines with the commit content
