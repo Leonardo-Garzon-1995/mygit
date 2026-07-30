@@ -20,7 +20,6 @@ const fs = require('../utils/filesystem')
 
 module.exports = function hashObject(args=[], options={}) {
 
-    try {
         const type = options.t || OBJECT_TYPES.BLOB
         const write = options.w || false
 
@@ -58,8 +57,4 @@ module.exports = function hashObject(args=[], options={}) {
             const hash = computeObjectHash(type, content)
             Output.success(hash)
         }
-
-    } catch (error) {
-        Output.error(error.message)
-    }
 }
