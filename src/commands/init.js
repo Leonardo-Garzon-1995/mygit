@@ -10,15 +10,10 @@ const logger = require('../utils/logger')
  * @throws {Error} If repository initialization fails
  */
 module.exports = function init(args = [], options = {}) {
-    try {
-        const targetDir = args[0] || process.cwd()
+    const targetDir = args[0] || process.cwd()
 
-        const repo = Repository.init(targetDir)
+    const repo = Repository.init(targetDir)
 
-        Output.success(`Initialized empty mygit repository in ${repo.mygitDir}`)
-        logger.info(`Initialized empty mygit repository in ${repo.mygitDir}`)
-        
-    } catch (error) {
-        Output.error(error.message)
-    }
+    Output.success(`Initialized empty mygit repository in ${repo.mygitDir}`)
+    logger.info(`Initialized empty mygit repository in ${repo.mygitDir}`)
 }
