@@ -6,9 +6,9 @@ const { sha1 } = require('../../utils/hash')
 const { objectPath } = require('../repository/paths')
 const { 
     ObjectNotFoundError, 
-    InvalidObjectError, 
     AmbiguousObjectError,
-    ValidationError
+    ValidationError,
+    CorruptObjectError
 } = require('../../errors')
 const { isValidObjectType } = require('../../utils/validation')
 const { OBJECT_TYPES } = require('../../constants')
@@ -36,7 +36,7 @@ function parseObject(data) {
     const nullIndex = data.indexOf(0)
 
     if (nullIndex === -1) {
-        throw new InvalidObjectError('Missing object header separator')
+        throw new CorruptObjectError('Missing object header separator')
     }
 
     const header = data.slice(0, nullIndex).toString()
@@ -44,7 +44,7 @@ function parseObject(data) {
     const content = data.slice(nullIndex + 1)
 
     if (content.length !== Number(size)) {
-        throw new InvalidObjectError(`Object size mismatch`)
+        throw new CorruptObjectError(`Object size mismatch`)
     }
 
     return { header, type, size: Number(size), content}
@@ -59,7 +59,7 @@ function parseObject(data) {
  */
 function writeObject(repo, type, content) {
     if (!isValidObjectType(type)) {
-        throw new InvalidObjectError(`Invalid object type: ${type}`)
+        throw new CorruptObjectError(`Invalid object type: ${type}`)
     }
     const serialized = serializeObject(type, content)
 
@@ -138,7 +138,7 @@ function resolveObjectHash(repo, objectName) {
     const objDir = path.join(repo.paths.objects, dir)
 
     if (!fs.exists(objDir)) {
-        return null
+        throw new ObjectNotFoundError(objectName)
     }
 
     const files = fs.listDir(objDir)
