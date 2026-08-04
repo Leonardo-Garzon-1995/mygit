@@ -86,10 +86,13 @@ function writeObject(repo, type, content) {
  * @returns {Object}
  */
 function readObject(repo, hash) {
-    const filePath = objectPath(repo, hash)
+
+    const resolvedHash = resolveObjectHash(repo, hash)
+
+    const filePath = objectPath(repo, resolvedHash)
 
     if (!fs.exists(filePath)) {
-        throw new ObjectNotFoundError(hash)
+        throw new ObjectNotFoundError(resolvedHash)
     }
 
     const compressed = fs.readFileBuffer(filePath)
@@ -132,7 +135,7 @@ function computeObjectHash(type, content) {
  */
 function resolveObjectHash(repo, objectName) {
     if (!objectName || typeof objectName !== 'string' || objectName.length < 4) {
-        throw new ValidationError('A hash is required and must be of type string.')
+        throw new ValidationError('A hash is required and must be at least 4 digits long.')
     }
     const dir = objectName.slice(0, 2)
     const objDir = path.join(repo.paths.objects, dir)
