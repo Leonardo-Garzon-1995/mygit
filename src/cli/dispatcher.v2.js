@@ -95,9 +95,7 @@ const commandAdapters = {
 
     'inspect-object'(handler, parsed) {
 
-        return handler(
-            requireArgument(parsed, 0, 'Object hash required')
-        )
+        return handler(parsed.args)
     },
 
     'cat-file'(handler, parsed) {
@@ -121,6 +119,10 @@ const commandAdapters = {
     },
 
     ignore(handler, parsed) {
+        return handler(parsed.args)
+    },
+
+    test(handler, parsed) {
         return handler(parsed.args)
     }
 }
