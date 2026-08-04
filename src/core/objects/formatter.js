@@ -23,6 +23,48 @@ function prettyPrintObject(type, content) {
     }
 }
 
+function parseAndFormatTree(buffer) {
+    let i = 0
+    let result = ''
+    while (i < buffer.length) {
+        const spaceIndex = buffer.indexOf(32, i)
+        const nullIndex = buffer.indexOf(0, spaceIndex)
+
+        const mode = buffer.slice(i, spaceIndex).toString()
+        const name = buffer.slice(spaceIndex + 1, nullIndex).toString()
+
+        const hash = buffer
+            .slice(nullIndex + 1, nullIndex + 21)
+            .toString('hex')
+
+        result += `${mode.padStart(6, '0')} ${name} ${hash}`
+
+        i = nullIndex + 21
+    }
+
+    return result
+}
+
+function formatObject(mygitObj) {
+    const {type, size, content } = mygitObj
+
+    let result = `Type: ${type}\n`
+    result += `Size: ${size} bytes\n`
+    result += `-------------------------\n`
+
+    if (type === 'blob') {
+        result += content.toString()
+    } else if (type === 'tree') {
+        result += parseAndFormatTree(content)
+    } else {
+        result += content.toString()
+    }
+
+    return result
+}
+
 module.exports = {
-    prettyPrintObject
+    prettyPrintObject,
+    formatObject,
+    parseAndFormatTree
 }
