@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 
-const getFileMode =  require('../helpers/getFileMode')
+const getFileMode = require('../core/objects/modes')
 const hashObjectContent = require('../helpers/hashObjectContent')
 const { getIndexPath, readIndex, writeIndex } = require('../core/index')
 const { getMygitignorePatterns, isIgnored } = require('../utils/mygitignore')
