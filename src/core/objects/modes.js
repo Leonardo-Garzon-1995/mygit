@@ -1,6 +1,4 @@
-const fs = require('fs') 
-
-// Maybe move later into /src/utils/filesystem.js
+const fs = require('../../utils/filesystem')
 
 /**
  * Returns the mode of a file given its path.
@@ -13,7 +11,7 @@ function getFileMode(filePath) {
 
     let stats;
     try {
-        stats = fs.lstatSync(filePath)
+        stats = fs.lstat(filePath)
     } catch (err) {
         return ""
     }
