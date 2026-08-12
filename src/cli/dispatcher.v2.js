@@ -122,6 +122,10 @@ const commandAdapters = {
         return handler(parsed.args)
     },
 
+    rm(handler, parsed) {
+        return handler(parsed.args, parsed.options)
+    },
+
     test(handler, parsed) {
         return handler(parsed.args)
     }
