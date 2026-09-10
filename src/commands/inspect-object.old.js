@@ -1,0 +1,74 @@
+const fs = require('fs')
+const path = require('path')
+const zlib = require('zlib')
+
+function parseAndLogTree(buffer) {
+    let i = 0
+    while (i < buffer.length) {
+        const spaceIndex = buffer.indexOf(32, i)
+        const nullIndex = buffer.indexOf(0, spaceIndex)
+
+        const mode = buffer.slice(i, spaceIndex).toString()
+        const name = buffer.slice(spaceIndex + 1, nullIndex).toString()
+
+        const hash = buffer
+            .slice(nullIndex + 1, nullIndex + 21)
+            .toString('hex')
+
+        console.log(`${mode.padStart(6, '0')} ${name} ${hash}`)
+
+        i = nullIndex + 21
+    }
+}
+
+function parseAndLogObject(buffer) {
+    const nullIndex = buffer.indexOf(0)
+
+    const header = buffer.slice(0, nullIndex).toString()
+    const content = buffer.slice(nullIndex + 1)
+
+    const [type, size] = header.split(' ')
+
+    console.log(`Type: ${type}`)
+    console.log(`Size: ${size} bytes`)
+    console.log(`-------------------------`)
+
+    if (type === 'blob') {
+        console.log(content.toString())
+    } else if (type === 'tree') {
+        parseAndLogTree(content)
+    } else {
+        console.log(content.toString())
+    }
+}
+
+/**
+ * Decompresses a stored object and prints its type, size, and parsed content.
+ * Tree objects are displayed entry by entry with mode, name, and hash.
+ * @param {string} hash - Full object hash to inspect
+ * @throws {Error} If the hash is missing, the object is not found, or decompression fails
+ */
+function inspectObject(hash) {
+
+    if (!hash) {
+        console.error('Missing hash')
+        console.error('Usage: mygit inspect-object <hash>')
+        process.exit(1)
+    }
+    const dir = hash.slice(0,2)
+    const file = hash.slice(2)
+
+    const objPath = path.join(process.cwd(), '.mygit', 'objects', dir, file)
+
+    if (!fs.existsSync(objPath)) {
+        console.error(`Object ${hash} not found`)
+        process.exit(1)
+    }
+
+    const compressed = fs.readFileSync(objPath)
+    const decompressed = zlib.inflateSync(compressed)
+
+    parseAndLogObject(decompressed)
+}
+
+module.exports = inspectObject

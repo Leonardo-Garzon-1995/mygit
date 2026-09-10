@@ -42,16 +42,14 @@ function removeFile(index, filePath, options) {
     }
 }
 
-function rm(args) {
+function rm(args = [], options = {}) {
     ensureRepo()
 
-    if (args.length === 0) {
-        console.error('Nothing specified, nothing removed.')
-        return
-    }
-
-    const cached = args.includes('--cached')
+    
+    const cached = options['cached'] || false
+    console.log(`Cached option: ${cached}`)
     const files = args.filter(arg => arg !== '--cached')
+    console.log(files)
 
     if (files.length === 0) {
         console.error('Nothing specified, nothing removed.')
