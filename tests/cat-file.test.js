@@ -5,7 +5,6 @@ const path = require('path')
 
 const run = require('./helpers/run')
 const { setupRepo, baseDir, cleanupRepo } = require('./helpers/setup')
-const hashObject = require('../src/commands/hash-object')
 
 test.beforeEach(setupRepo)
 test.afterEach(cleanupRepo)
@@ -50,7 +49,7 @@ test('cat-file supports short hash', () => {
   const filePath = path.join(baseDir, 'file.txt')
   fs.writeFileSync(filePath, 'hello')
 
-  const hash = hashObject('blob', filePath, true)
+  const hash = run(`mygit hash-object ${filePath} -w`)
   const short = hash.slice(0, 6)
 
   const content = run(`mygit cat-file -p ${short}`)
