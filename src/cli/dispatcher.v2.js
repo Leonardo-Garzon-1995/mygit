@@ -137,10 +137,12 @@ const commandAdapters = {
 async function dispatch(parsed) {
     if (!parsed.command) {
         displayHelp()
+        throw new ValidationError('No command specified')
     }
 
     if (parsed.command === 'help') {
         displayHelp(parsed.args[0])
+        return 
     }
 
     const adapter = commandAdapters[parsed.command]
