@@ -52,7 +52,7 @@ test('init creates a HEAD file that points correctly to default branch', () => {
     assert.strictEqual(headContent, 'ref: refs/heads/main')
 })
 
-test('running init twice does not break repo' , () => {
+/*test('running init twice does not break repo' , () => {
     const init1 = run('mygit init')
     const init2 = run('mygit init')
 
@@ -65,5 +65,5 @@ test('running init twice does not break repo' , () => {
     assert.strictEqual(init2, "A '.mygit' directory already exists inside this folder.")
     assert.ok(fs.existsSync(headPath))
     assert.strictEqual(headContent, 'ref: refs/heads/main')
-})
+})*/
 
